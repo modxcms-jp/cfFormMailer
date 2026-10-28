@@ -55,7 +55,8 @@ trait FormRenderingTrait
         preg_match("/name=([\"'])(.+?)\\1/i", $tag[0], $m_name);
         preg_match("/value=([\"'])(.*?)\\1/i", $tag[0], $m_value);
 
-        if (!isset($m_name[2]) || !isset($m_type[2])) {
+        // select・textarea と type の無い input には type 属性が無いので、name だけで判定する
+        if (!isset($m_name[2])) {
             return $html;
         }
 
@@ -64,7 +65,7 @@ trait FormRenderingTrait
             return $html;
         }
 
-        $fieldType = $this->determineFieldType($m_type[2]);
+        $fieldType = $this->determineFieldType($m_type[2] ?? '');
         if ($fieldType === null) {
             return $html;
         }

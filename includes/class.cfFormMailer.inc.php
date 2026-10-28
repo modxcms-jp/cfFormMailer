@@ -561,10 +561,11 @@ class Class_cfFormMailer
         if ($method['type'] === 'file') {
             $uploaded_file = sessionv("_cf_uploaded.{$field}");
             $file_tmp_name = $_FILES[$field]['tmp_name'] ?? '';
-            $hasUploadedFile = is_array($uploaded_file) && is_file($uploaded_file['path']);
-            $hasNewFile = !postv('return') && !empty($file_tmp_name);
+            $hasUploadedFile = is_array($uploaded_file) && is_file($uploaded_file['path'] ?? '');
+            $hasNewFile = !empty($file_tmp_name);
 
-            if (!$hasUploadedFile && !$hasNewFile) {
+            // 確認画面から戻ったときは検証しない
+            if (!$hasUploadedFile && !$hasNewFile && !postv('return')) {
                 $this->setFormError($field, $label, '選択必須項目です');
             }
             return;
