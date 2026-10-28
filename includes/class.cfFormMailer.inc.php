@@ -483,15 +483,15 @@ class Class_cfFormMailer
 
             switch ($m_type[2] ?? '') {
                 // 復元処理しないタグ
-                case 'submit';
-                case 'image';
-                case 'file';
-                case 'button';
-                case 'reset';
-                case 'hidden';
+                case 'submit':
+                case 'image':
+                case 'file':
+                case 'button':
+                case 'reset':
+                case 'hidden':
                     continue 2;
-                case 'checkbox';
-                case 'radio';
+                case 'checkbox':
+                case 'radio':
                     $fieldType = $m_type[2];
                     break;
                 default:
@@ -2306,7 +2306,7 @@ class Class_cfFormMailer
      * @param $field
      * @return bool
      */
-    private function _def_convert($value, $param = 'K', $field)
+    private function _def_convert($value, $param, $field)
     {
         if (!$param) {
             $param = 'K';
@@ -2328,7 +2328,7 @@ class Class_cfFormMailer
      * @param $field
      * @return bool
      */
-    private function _def_zenhan($value, $param = 'VKas', $field)
+    private function _def_zenhan($value, $param, $field)
     {
         $this->form[$field] = mb_convert_kana(
             $this->form[$field] ?? '',
@@ -2348,7 +2348,7 @@ class Class_cfFormMailer
      * @param $field
      * @return bool
      */
-    private function _def_hanzen($value, $param = 'VKAS', $field)
+    private function _def_hanzen($value, $param, $field)
     {
         $this->form[$field] = mb_convert_kana(
             $this->form[$field] ?? '',
