@@ -119,12 +119,14 @@ reply_to = email
 reply_subject = お問い合わせありがとうございます
 
 # テンプレート設定
-tmpl_input = @FILE:forms/myform/web_form.tpl.html
-tmpl_conf = @FILE:forms/myform/web_confirm.tpl.html
-tmpl_comp = @FILE:forms/myform/web_thanks.tpl.html
-tmpl_mail_admin = @FILE:forms/myform/mail_receive.tpl.txt
-tmpl_mail_reply = @FILE:forms/myform/mail_autoreply.tpl.txt
+tmpl_input = @FILE:assets/snippets/cfFormMailer/forms/myform/web_form.tpl.html
+tmpl_conf = @FILE:assets/snippets/cfFormMailer/forms/myform/web_confirm.tpl.html
+tmpl_comp = @FILE:assets/snippets/cfFormMailer/forms/myform/web_thanks.tpl.html
+tmpl_mail_admin = @FILE:assets/snippets/cfFormMailer/forms/myform/mail_receive.tpl.txt
+tmpl_mail_reply = @FILE:assets/snippets/cfFormMailer/forms/myform/mail_autoreply.tpl.txt
 ```
+
+`@FILE:` のパスは、MODX のルート（または `includes/`）からの相対で探します。
 
 #### 方法B: チャンクとして作成
 
@@ -164,7 +166,7 @@ forms/myform/
 #### ファイル形式の設定を使用する場合
 
 ```php
-[!cfFormMailer?&config=`@FILE:forms/myform/config.ini`!]
+[!cfFormMailer?&config=`@FILE:assets/snippets/cfFormMailer/forms/myform/config.ini`!]
 ```
 
 #### チャンク形式の設定を使用する場合
@@ -359,7 +361,7 @@ cp -r new_version/* /assets/snippets/cfFormMailer/
 
 ```php
 # configパラメータを追加
-[!cfFormMailer?&config=`@FILE:forms/myform/config.ini`!]
+[!cfFormMailer?&config=`@FILE:assets/snippets/cfFormMailer/forms/myform/config.ini`!]
 ```
 
 ---
@@ -374,7 +376,7 @@ cp -r new_version/* /assets/snippets/cfFormMailer/
 
    ```ini
    # config.ini を確認
-   tmpl_input = @FILE:forms/myform/web_form.tpl.html
+   tmpl_input = @FILE:assets/snippets/cfFormMailer/forms/myform/web_form.tpl.html
 
    # 実際のファイル存在確認
    ls -la /assets/snippets/cfFormMailer/forms/myform/web_form.tpl.html

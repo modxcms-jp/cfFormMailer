@@ -47,7 +47,7 @@ forms/sample/config.with_comment.ini を参考に設定ファイルを作成
 
 ```php
 <!-- MODXドキュメント内 -->
-[!cfFormMailer?&config=`@FILE:forms/myform/config.ini`!]
+[!cfFormMailer?&config=`@FILE:assets/snippets/cfFormMailer/forms/myform/config.ini`!]
 ```
 
 詳細は [インストールガイド](docs/INSTALLATION.md) をご覧ください。

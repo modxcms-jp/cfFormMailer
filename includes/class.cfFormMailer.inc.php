@@ -723,7 +723,7 @@ class Class_cfFormMailer
             if ($reply_to) {
                 $debug_info .= "Reply-To: " . $reply_to . "\n";
             }
-            $debug_info .= "文字コード: " . ($this->config('mail_charset') ?: 'iso-2022-jp') . "\n";
+            $debug_info .= "文字コード: " . $this->mailCharset() . "\n";
             $debug_info .= "HTMLメール: " . ($this->config('admin_ishtml') ? '有効' : '無効') . "\n";
             if ($upload_flag) {
                 $debug_info .= "添付ファイル: あり\n";
@@ -737,9 +737,7 @@ class Class_cfFormMailer
         if (!$sent) {
             $errormsg = 'メール送信に失敗しました::' . $pm->ErrorInfo;
             $this->setError($errormsg);
-            $vars = evo()->htmlspecialchars(
-                var_export($pm, true)
-            );
+            $vars = var_export($pm, true);
             $this->logEvent(1, 3, $errormsg . "\n" . $vars, 'Admin Mail Error');
             return false;
         }
@@ -834,7 +832,7 @@ class Class_cfFormMailer
             if ($this->config('reply_fromname')) {
                 $debug_info .= "送信者名: " . $this->config('reply_fromname') . "\n";
             }
-            $debug_info .= "文字コード: " . ($this->config('mail_charset') ?: 'iso-2022-jp') . "\n";
+            $debug_info .= "文字コード: " . $this->mailCharset() . "\n";
             $debug_info .= "HTMLメール: " . ($this->config('reply_ishtml') ? '有効' : '無効') . "\n";
             $debug_info .= "テンプレート: " . $template_filename . "\n";
             if ($this->config('attach_file') || $has_uploaded_attachment) {
@@ -850,9 +848,7 @@ class Class_cfFormMailer
         if (!$sent) {
             $errormsg = 'メール送信に失敗しました::' . $pm->ErrorInfo;
             $this->setError($errormsg);
-            $vars = evo()->htmlspecialchars(
-                var_export($pm, true)
-            );
+            $vars = var_export($pm, true);
             $this->logEvent(1, 3, $errormsg . "\n" . $vars, 'AutoReply Error');
             return false;
         }
@@ -2095,6 +2091,9 @@ class Class_cfFormMailer
 
         // メッセージに呼び出し元情報を付加
         $msg = "[{$file}:{$line}] {$msg}";
+
+        // 送信された値（件名など）を含むことがあるので、HTML として出す前にエスケープする
+        $msg = evo()->htmlspecialchars($msg, ENT_QUOTES);
 
         // 改行コード（\n, \r\n, \r）を<br>タグに変換
         $msg = str_replace(["\r\n", "\r", "\n"], '<br>', $msg);
