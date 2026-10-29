@@ -2480,7 +2480,30 @@ class Class_cfFormMailer
             '%w' => 'w',  // 曜日（0-6）
         ];
 
-        $date_format = str_replace(array_keys($format_map), array_values($format_map), $param);
+        // 指定子以外の英字は DateTime の書式文字と見なされないようエスケープする
+        $date_format = '';
+        $len = strlen($param);
+        for ($i = 0; $i < $len; $i++) {
+            $c = $param[$i];
+            if ($c === '%' && $i + 1 < $len) {
+                $directive = '%' . $param[$i + 1];
+                if (isset($format_map[$directive])) {
+                    $date_format .= $format_map[$directive];
+                    $i++;
+                    continue;
+                }
+                if ($directive === '%%') {
+                    $date_format .= '%';
+                    $i++;
+                    continue;
+                }
+            }
+            if (('a' <= $c && $c <= 'z') || ('A' <= $c && $c <= 'Z') || $c === '\\') {
+                $date_format .= '\\' . $c;
+                continue;
+            }
+            $date_format .= $c;
+        }
         return $datetime->format($date_format);
     }
 
