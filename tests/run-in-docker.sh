@@ -1,7 +1,7 @@
 #!/bin/sh
 # Docker でテストを流す（ローカルに PHP が無くてもよい）。
 #
-#   tests/run-in-docker.sh                 PHP 7.4・8.3・8.5 で流す
+#   tests/run-in-docker.sh                 PHP 7.4・8.0・8.3・8.5 で流す
 #   tests/run-in-docker.sh 8.5             指定した版だけ流す
 #   UPDATE_SNAPSHOTS=1 tests/run-in-docker.sh 8.5   スナップショットを書き直す
 #
@@ -16,7 +16,7 @@ if [ ! -d vendor ]; then
         install --no-interaction --no-progress
 fi
 
-versions="${*:-7.4 8.3 8.5}"
+versions="${*:-7.4 8.0 8.3 8.5}"
 status=0
 for v in $versions; do
     echo "== PHP $v =="
