@@ -69,33 +69,11 @@
   </table>
   </fieldset>
 
-  <form action="[~[*id*]~]" method="post"><input type="hidden" name="_mode" value="send" />  
-    <p class="buttons"><input type="submit" value="　送信する　" /></p>
-  <input type="hidden" name="name_f" value="山田" />
-<input type="hidden" name="name_l" value="太郎" />
-<input type="hidden" name="company" value="" />
-<input type="hidden" name="email1" value="taro" />
-<input type="hidden" name="email2" value="@docomo.ne.jp" />
-<input type="hidden" name="email" value="taro@example.com" />
-<input type="hidden" name="gender" value="男性" />
-<input type="hidden" name="zip1" value="123" />
-<input type="hidden" name="zip2" value="4567" />
-<input type="hidden" name="pref" value="東京都" />
-<input type="hidden" name="addr1" value="千代田区" />
-<input type="hidden" name="addr2" value="1-1" />
-<input type="hidden" name="addr3" value="" />
-<input type="hidden" name="tel" value="03-1234-5678" />
-<input type="hidden" name="tel_confirm" value="03-1234-5678" />
-<input type="hidden" name="summary" value="その他" />
-<input type="hidden" name="message" value="1行目
-2行目 &lt;b&gt;&amp;&lt;/b&gt; &quot;引用&quot;" />
-<input type="hidden" name="way" value="メール" />
-<input type="hidden" name="own[]" value="ライトサーベル" />
-<input type="hidden" name="own[]" value="ですの音" />
-<input type="hidden" name="impression[]" value="なし" />
-<input type="hidden" name="veri" value="abcd" /><input type="hidden" name="_cffm_token" value="<TOKEN>" /></form>
   <form action="[~[*id*]~]" method="post"><input type="hidden" name="_mode" value="send" />
-    <p class="buttons"><input type="submit" name="return" value="戻る" /></p>
+    <p class="buttons">
+      <input type="submit" value="　送信する　" />
+      <input type="submit" name="return" value="戻る" />
+    </p>
   <input type="hidden" name="name_f" value="山田" />
 <input type="hidden" name="name_l" value="太郎" />
 <input type="hidden" name="company" value="" />
