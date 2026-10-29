@@ -1316,9 +1316,10 @@ class Class_cfFormMailer
             if (is_callable(array($this, '_f_' . $fType))) {
                 $funcName = '_f_' . $fType;
                 $fParam = $m[5] ?? '';
+                $filtered = $this->$funcName($val, $fParam);
                 $text = str_replace(
                     $m[0],
-                    $this->$funcName($val, $fParam),
+                    is_array($filtered) ? implode($join, $filtered) : $filtered,
                     $text
                 );
                 continue;
@@ -1326,9 +1327,10 @@ class Class_cfFormMailer
             if (is_callable('_filter_' . $fType)) {
                 $funcName = '_filter_' . $fType;
                 $fParam = $m[5] ?? '';
+                $filtered = $funcName($val, $fParam);
                 $text = str_replace(
                     $m[0],
-                    $funcName($val, $fParam),
+                    is_array($filtered) ? implode($join, $filtered) : $filtered,
                     $text
                 );
                 continue;
@@ -2420,7 +2422,14 @@ class Class_cfFormMailer
     {
 
         if (is_array($text)) {
-            return array_map([$this, '_f_num'], $text, $param);
+            return array_map(function ($v) use ($param) {
+                return $this->_f_num($v, $param);
+            }, $text);
+        }
+
+        // 数値でないもの（空欄の &nbsp; など）はそのまま
+        if (!is_numeric($text)) {
+            return $text;
         }
 
         return number_format($text);
@@ -2433,13 +2442,19 @@ class Class_cfFormMailer
     {
 
         if (is_array($text)) {
-            return array_map([$this, '_f_dateformat'], $text, $param);
+            return array_map(function ($v) use ($param) {
+                return $this->_f_dateformat($v, $param);
+            }, $text);
         }
 
         $timestamp = strtotime($text);
+        // 日付として読めないもの（空欄の &nbsp; など）はそのまま
+        if ($timestamp === false) {
+            return $text;
+        }
 
-        // PHP 8.1未満の場合はstrftimeを使用
-        if (function_exists('strftime')) {
+        // PHP 8.1未満の場合はstrftimeを使用（8.1 から Deprecated）
+        if (PHP_VERSION_ID < 80100 && function_exists('strftime')) {
             return strftime($param, $timestamp);
         }
 
@@ -2465,7 +2480,30 @@ class Class_cfFormMailer
             '%w' => 'w',  // 曜日（0-6）
         ];
 
-        $date_format = str_replace(array_keys($format_map), array_values($format_map), $param);
+        // 指定子以外の英字は DateTime の書式文字と見なされないようエスケープする
+        $date_format = '';
+        $len = strlen($param);
+        for ($i = 0; $i < $len; $i++) {
+            $c = $param[$i];
+            if ($c === '%' && $i + 1 < $len) {
+                $directive = '%' . $param[$i + 1];
+                if (isset($format_map[$directive])) {
+                    $date_format .= $format_map[$directive];
+                    $i++;
+                    continue;
+                }
+                if ($directive === '%%') {
+                    $date_format .= '%';
+                    $i++;
+                    continue;
+                }
+            }
+            if (('a' <= $c && $c <= 'z') || ('A' <= $c && $c <= 'Z') || $c === '\\') {
+                $date_format .= '\\' . $c;
+                continue;
+            }
+            $date_format .= $c;
+        }
         return $datetime->format($date_format);
     }
 
@@ -2476,7 +2514,9 @@ class Class_cfFormMailer
     {
 
         if (is_array($text)) {
-            return array_map([$this, '_f_sprintf'], $text, $param);
+            return array_map(function ($v) use ($param) {
+                return $this->_f_sprintf($v, $param);
+            }, $text);
         }
 
         return sprintf($param, $text);
