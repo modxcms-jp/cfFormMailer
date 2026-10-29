@@ -855,8 +855,8 @@ class Class_cfFormMailer
             $mails = explode(',', $this->config('admin_mail'));
         } else {
             $dynamic_send_to = sessionv('dynamic_send_to');
-            $field_value = $this->form[$this->config('dynamic_send_to_field')];
-            if (empty($dynamic_send_to) || !$field_value) {
+            $field_value = $this->form[$this->config('dynamic_send_to_field')] ?? '';
+            if (empty($dynamic_send_to) || !$field_value || !is_scalar($field_value) || empty($dynamic_send_to[$field_value])) {
                 $mails = explode(',', $this->config('admin_mail'));
             } else {
                 $mails = explode(',', $dynamic_send_to[$field_value]);
@@ -933,7 +933,7 @@ class Class_cfFormMailer
                 $groups = explode(',', $g_match[1]);
                 $isErr = 0;
                 foreach ($groups as $group) {
-                    $isErr = $errors['error.' . strtr($group, array(' ' => ''))] ? 1 : $isErr;
+                    $isErr = !empty($errors['error.' . strtr($group, array(' ' => ''))]) ? 1 : $isErr;
                 }
                 if ($isErr) {
                     $html = str_replace($tag[0], $tag[2], $html);
@@ -1543,7 +1543,7 @@ class Class_cfFormMailer
                 $html,
                 $matches
             );
-            if ($matches[2]) {
+            if (!empty($matches[2])) {
                 preg_match_all(
                     "@<option.+?</option>@uims",
                     $matches[2],
@@ -1561,7 +1561,7 @@ class Class_cfFormMailer
             );
         }
 
-        if (!$m_options[0]) {
+        if (empty($m_options[0])) {
             return null;
         }
 
@@ -1737,7 +1737,7 @@ class Class_cfFormMailer
             return '';
         }
         if (strpos($this->config('reply_to'), '+') === false) {
-            return $this->form[$this->config('reply_to')];
+            return $this->form[$this->config('reply_to')] ?? '';
         }
 
         $reply_to = array();
@@ -2075,6 +2075,7 @@ class Class_cfFormMailer
         if (!preg_match("/([0-9]+)?(-)?([0-9]+)?/", $param, $match)) {
             return true;
         }
+        $match += array('', '', '', '');
 
         if ($match[1] && empty($match[2]) && empty($match[3])) {
             if (mb_strlen($value) != $match[1]) {
@@ -2133,33 +2134,23 @@ class Class_cfFormMailer
         if (!preg_match('/([0-9-]+)?(~)?([0-9-]+)?/', $param, $match)) {
             return true;
         }
+        $match += array('', '', '', '');
+        list(, $min, $tilde, $max) = $match;
 
-        if ($match[1] && !$match[2] && !$match[3]) {
-            if ($match[1] < $value) {
-                return '入力値が範囲外です';
-            }
-
-            return true;
-        }
-
-        if (!$match[1] && $match[2] && $match[3]) {
-            if ($match[3] < $value) {
+        // 数値 1 つだけの指定は上限
+        if ($tilde === '') {
+            if ($min !== '' && $min < $value) {
                 return '入力値が範囲外です';
             }
             return true;
         }
 
-        if (isset($match[1], $match[2])) {
-            if ($value < $match[1]) {
-                return '入力値が範囲外です';
-            }
-
-            if ($match[3] < $value) {
-                return '入力値が範囲外です';
-            }
-            return true;
+        if ($min !== '' && $value < $min) {
+            return '入力値が範囲外です';
         }
-
+        if ($max !== '' && $max < $value) {
+            return '入力値が範囲外です';
+        }
         return true;
     }
 
@@ -2169,7 +2160,7 @@ class Class_cfFormMailer
      */
     private function _def_sameas($value, $param, $field)
     {
-        if ($value == $this->form[$param]) {
+        if ($value == ($this->form[$param] ?? null)) {
             return true;
         }
 
@@ -2177,7 +2168,7 @@ class Class_cfFormMailer
         return sprintf(
             '&laquo; %s &raquo; と一致しません',
             $this->adaptEncoding(
-                $this->parsedForm[$param]['label']
+                $this->parsedForm[$param]['label'] ?? $param
             )
         );
     }
@@ -2330,6 +2321,9 @@ class Class_cfFormMailer
      */
     private function _def_zenhan($value, $param, $field)
     {
+        if (!$param) {
+            $param = 'VKas';
+        }
         $this->form[$field] = mb_convert_kana(
             $this->form[$field] ?? '',
             $param,
@@ -2350,6 +2344,9 @@ class Class_cfFormMailer
      */
     private function _def_hanzen($value, $param, $field)
     {
+        if (!$param) {
+            $param = 'VKAS';
+        }
         $this->form[$field] = mb_convert_kana(
             $this->form[$field] ?? '',
             $param,
