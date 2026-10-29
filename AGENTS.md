@@ -7,6 +7,16 @@
 
 ---
 
+## ⚠️ いま守る方針（2026-10 時点。以降の記述と食い違うときは、この節を優先する）
+
+- **PHP 7.4〜8.5 に対応する。コードは PHP 7.4 の構文で書く**（`match`、`?->`、`readonly`、コンストラクタでのプロパティ宣言、`mixed`・union 型、`enum` は使わない）
+- **`declare(strict_types=1)` は使わない**。既存のコードは緩い比較や型の変換に頼った振る舞いをしており、付けると振る舞いが変わるため。CI で確認している
+- **リファクタリングでは振る舞いを変えない**。`tests/Characterization/` のスナップショットが変わらないことで確かめる。不具合の修正は、リファクタとは別の PR にする
+- **テストの流し方**：`tests/run-in-docker.sh`（PHP 7.4・8.3・8.5。ローカルに PHP が無くても Docker があれば動く）
+- このガイドの以降のコード例には、PHP 8 の構文や、まだ無いディレクトリ構成（`src/` など）が含まれる。全体の書き直しを予定している
+
+---
+
 ## 📋 目次
 
 1. [プロジェクト概要](#プロジェクト概要)
@@ -421,29 +431,26 @@ public function error()       // 動詞がない
 
 ### 型宣言
 
-**厳格な型宣言を必須とする**
+**`declare(strict_types=1)` は使わない。型宣言は、型が確かなところだけに付ける**
+
+- フォームの値や設定の値を運ぶ引数・戻り値には、スカラーの型宣言（`string` など）を付けない。値は `string`・`array`・`null`・`false` などが混ざって届き、型宣言を付けると TypeError や型の変換で振る舞いが変わるため
+- `array` やクラスの型は、確かなところに付けてよい
+- PHP 7.4 の構文で書く（`?->`・`readonly`・コンストラクタでのプロパティ宣言などは使わない）
 
 ```php
-<?php declare(strict_types=1);  // ファイル先頭に必須
+<?php
 
 namespace CfFormMailer\Validation;
 
 class FormValidator
 {
-    // プロパティに型宣言
-    private array $rules = [];
-    private ?ValidationResult $lastResult = null;
+    /** @var array */
+    private $rules = [];
 
-    // パラメータと戻り値に型宣言
-    public function validate(array $data): ValidationResult
+    // 値を運ぶ引数には型を付けない。結果のクラスは型を付けてよい
+    public function validate(array $data, $field): ValidationResult
     {
         // ...
-    }
-
-    // Nullable型
-    public function getLastError(): ?string
-    {
-        return $this->lastResult?->getFirstError();
     }
 }
 ```

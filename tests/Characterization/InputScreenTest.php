@@ -9,7 +9,8 @@ use CfFormMailer\Tests\Harness\CharacterizationTestCase;
  */
 class InputScreenTest extends CharacterizationTestCase
 {
-    public function testSampleFormInitialDisplay(): void
+    /** @test */
+    public function サンプルのフォームの最初の表示(): void
     {
         $this->assertSnapshot('sample_initial', $this->runStep());
     }
