@@ -458,6 +458,9 @@ class Class_cfFormMailer
 
         // タグごとに処理
         foreach ($match as $tag) {
+            // 前のタグの置き換えを持ち越さない
+            $pat = '';
+            $rep = '';
             $m_type = array();
             $m_name = array();
             $m_value = array();
@@ -465,7 +468,8 @@ class Class_cfFormMailer
             preg_match("/name=([\"'])(.+?)\\1/i", $tag[0], $m_name);
             preg_match("/value=([\"'])(.*?)\\1/i", $tag[0], $m_value);
 
-            if (!isset($m_name[2]) || !isset($m_type[2])) {
+            // select・textarea と type の無い input には type 属性が無いので、name だけで判定する
+            if (!isset($m_name[2])) {
                 continue;
             }
 
@@ -474,18 +478,20 @@ class Class_cfFormMailer
             if ($fieldName === '_mode') {
                 continue;
             }
+            // 未選択のチェックボックス・ラジオは送信値にキーが無い
+            $fieldValue = $params[$fieldName] ?? '';
 
-            switch ($m_type[2]) {
+            switch ($m_type[2] ?? '') {
                 // 復元処理しないタグ
-                case 'submit';
-                case 'image';
-                case 'file';
-                case 'button';
-                case 'reset';
-                case 'hidden';
+                case 'submit':
+                case 'image':
+                case 'file':
+                case 'button':
+                case 'reset':
+                case 'hidden':
                     continue 2;
-                case 'checkbox';
-                case 'radio';
+                case 'checkbox':
+                case 'radio':
                     $fieldType = $m_type[2];
                     break;
                 default:
@@ -496,20 +502,20 @@ class Class_cfFormMailer
             if ($tag[1] === 'input' && $fieldType === 'text') {
                 if (count($m_value) > 1) {
                     $pat = $m_value[0];
-                    $rep = 'value="' . $this->encodeHTML($params[$fieldName]) . '"';
+                    $rep = 'value="' . $this->encodeHTML($fieldValue) . '"';
                 } else {
                     $pat = $tag[2];
-                    $rep = $tag[2] . ' value="' . $this->encodeHTML($params[$fieldName]) . '"';
+                    $rep = $tag[2] . ' value="' . $this->encodeHTML($fieldValue) . '"';
                 }
                 // チェックボックス
             } elseif ($tag[1] === 'input' && $fieldType === 'checkbox') {
-                if (isset($m_value[2]) && ($m_value[2] == $params[$fieldName] || (is_array($params[$fieldName]) && in_array($m_value[2], $params[$fieldName])))) {
+                if (isset($m_value[2]) && ($m_value[2] == $fieldValue || (is_array($fieldValue) && in_array($m_value[2], $fieldValue)))) {
                     $pat = $tag[2];
                     $rep = $tag[2] . ' checked="checked"';
                 }
                 // ラジオボタン
             } elseif ($tag[1] === 'input' && $fieldType === 'radio') {
-                if (isset($m_value[2]) && $m_value[2] == $params[$fieldName]) {
+                if (isset($m_value[2]) && $m_value[2] == $fieldValue) {
                     $pat = $tag[2];
                     $rep = $tag[2] . ' checked="checked"';
                 }
@@ -536,7 +542,7 @@ class Class_cfFormMailer
                             ),
                             $tag[0]
                         );
-                        if ($v[3] == $params[$fieldName]) {
+                        if ($v[3] == $fieldValue) {
                             $tag[0] = str_replace(
                                 $v[0],
                                 str_replace(
@@ -552,14 +558,14 @@ class Class_cfFormMailer
                 }
                 // 複数行テキスト
             } elseif ($tag[1] === 'textarea') {
-                if ($params[$fieldName]) {
+                if ($fieldValue) {
                     $pat = $tag[0];
                     $rep = sprintf(
                         '<%s%s%s>%s</textarea>',
                         $tag[1],
                         $tag[2],
                         $tag[3],
-                        $this->encodeHTML($params[$fieldName])
+                        $this->encodeHTML($fieldValue)
                     );
                 }
             }
@@ -2300,7 +2306,7 @@ class Class_cfFormMailer
      * @param $field
      * @return bool
      */
-    private function _def_convert($value, $param = 'K', $field)
+    private function _def_convert($value, $param, $field)
     {
         if (!$param) {
             $param = 'K';
@@ -2322,7 +2328,7 @@ class Class_cfFormMailer
      * @param $field
      * @return bool
      */
-    private function _def_zenhan($value, $param = 'VKas', $field)
+    private function _def_zenhan($value, $param, $field)
     {
         $this->form[$field] = mb_convert_kana(
             $this->form[$field] ?? '',
@@ -2342,7 +2348,7 @@ class Class_cfFormMailer
      * @param $field
      * @return bool
      */
-    private function _def_hanzen($value, $param = 'VKAS', $field)
+    private function _def_hanzen($value, $param, $field)
     {
         $this->form[$field] = mb_convert_kana(
             $this->form[$field] ?? '',
