@@ -2129,33 +2129,22 @@ class Class_cfFormMailer
             return true;
         }
         $match += array('', '', '', '');
+        list(, $min, $tilde, $max) = $match;
 
-        if ($match[1] && !$match[2] && !$match[3]) {
-            if ($match[1] < $value) {
-                return '入力値が範囲外です';
-            }
-
-            return true;
-        }
-
-        if (!$match[1] && $match[2] && $match[3]) {
-            if ($match[3] < $value) {
+        // 数値 1 つだけの指定は上限
+        if ($tilde === '') {
+            if ($min !== '' && $min < $value) {
                 return '入力値が範囲外です';
             }
             return true;
         }
 
-        if (isset($match[1], $match[2])) {
-            if ($value < $match[1]) {
-                return '入力値が範囲外です';
-            }
-
-            if ($match[3] !== '' && $match[3] < $value) {
-                return '入力値が範囲外です';
-            }
-            return true;
+        if ($min !== '' && $value < $min) {
+            return '入力値が範囲外です';
         }
-
+        if ($max !== '' && $max < $value) {
+            return '入力値が範囲外です';
+        }
         return true;
     }
 
