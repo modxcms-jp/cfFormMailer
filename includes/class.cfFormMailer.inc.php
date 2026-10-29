@@ -680,7 +680,7 @@ class Class_cfFormMailer
             $tmpl,
             ($this->makePh($this->form, $admin_address))
         );
-        $pm->Encoding = '7bit';
+        $this->applyMailCharset($pm);
 
         // ユーザーからのファイル送信
         $upload_flag = false;
@@ -694,7 +694,7 @@ class Class_cfFormMailer
                     $attach_file['path'],
                     mb_convert_encoding(
                         urldecode(basename($attach_file['path'])),
-                        $this->config('mail_charset'),
+                        $this->mailCharset(),
                         $this->config('charset')
                     )
                 );
@@ -757,7 +757,7 @@ class Class_cfFormMailer
             $tmpl_u,
             ($this->makePh($this->form, $admin_address))
         );
-        $pm->Encoding = '7bit';
+        $this->applyMailCharset($pm);
         // 添付ファイル処理
         if ($this->config('attach_file') && is_file($this->config('attach_file'))) {
             if (!$this->config('attach_file_name')) {
@@ -767,7 +767,7 @@ class Class_cfFormMailer
                     $this->config('attach_file'),
                     mb_convert_encoding(
                         $this->config('attach_file_name'),
-                        $this->config('mail_charset'),
+                        $this->mailCharset(),
                         $this->config('charset')
                     )
                 );
@@ -784,7 +784,7 @@ class Class_cfFormMailer
                     $attach_file['path'],
                     mb_convert_encoding(
                         urldecode(basename($attach_file['path'])),
-                        $this->config('mail_charset'),
+                        $this->mailCharset(),
                         $this->config('charset')
                     )
                 );
@@ -833,10 +833,34 @@ class Class_cfFormMailer
                     $this->config('allow_html') ? '<br />' : "\n"
                 )
             ),
-            $this->config('mail_charset'),
+            $this->mailCharset(),
             $this->config('charset')
         );
     }
+    /**
+     * 送信メールの文字コード（未指定・空欄は utf-8）
+     */
+    private function mailCharset()
+    {
+        $charset = trim((string)$this->config('mail_charset'));
+        return $charset !== '' ? $charset : 'utf-8';
+    }
+
+    /**
+     * 本文の文字コードに合わせて PHPMailer の CharSet / Encoding を指定する
+     * （MODxMailer の既定に頼らず、本文と宣言を必ず一致させる）
+     */
+    private function applyMailCharset($pm)
+    {
+        if (stripos($this->mailCharset(), 'iso-2022-jp') === 0) {
+            $pm->CharSet = 'ISO-2022-JP';
+            $pm->Encoding = '7bit';
+            return;
+        }
+        $pm->CharSet = $this->mailCharset();
+        $pm->Encoding = 'base64';
+    }
+
     private function makePh($form, $adminmail)
     {
         $remote_addr = serverv('REMOTE_ADDR', '');
@@ -1957,7 +1981,7 @@ class Class_cfFormMailer
             'allow_html'     => 0,
             'autosave'       => 0,
             'send_mail'      => 1,
-            'mail_charset'   => 'iso-2022-jp-ms',
+            'mail_charset'   => 'utf-8',
         );
     }
 
