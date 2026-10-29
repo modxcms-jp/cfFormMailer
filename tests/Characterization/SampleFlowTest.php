@@ -22,12 +22,14 @@ class SampleFlowTest extends CharacterizationTestCase
         return $this->runStep(['post' => $this->validPost()]);
     }
 
-    public function testConfirmWithEmptyPostShowsErrors(): void
+    /** @test */
+    public function 空の入力で確認へ進むとエラーを表示する(): void
     {
         $this->assertSnapshot('conf_empty', $this->runStep(['post' => ['_mode' => 'conf']]));
     }
 
-    public function testConfirmWithInvalidValuesShowsErrorsAndRestoresInput(): void
+    /** @test */
+    public function 誤りのある入力ではエラーを表示し入力を復元する(): void
     {
         $post = array_replace($this->validPost(), [
             'name_l' => '',
@@ -40,12 +42,14 @@ class SampleFlowTest extends CharacterizationTestCase
         $this->assertSnapshot('conf_invalid', $this->runStep(['post' => $post]));
     }
 
-    public function testConfirmWithValidPostShowsConfirmPage(): void
+    /** @test */
+    public function 正しい入力で確認画面を表示する(): void
     {
         $this->assertSnapshot('conf_valid', $this->confirm());
     }
 
-    public function testSendFromConfirmPage(): void
+    /** @test */
+    public function 確認画面から送信するとメールを送り完了画面を表示する(): void
     {
         $confirm = $this->confirm();
         $this->assertSnapshot('send_ok', $this->runStep([
@@ -54,7 +58,8 @@ class SampleFlowTest extends CharacterizationTestCase
         ]));
     }
 
-    public function testSendWithWrongTokenIsRejected(): void
+    /** @test */
+    public function トークンが違う送信を拒否する(): void
     {
         $confirm = $this->confirm();
         $post = Browser::submit($confirm['return'], 0);
@@ -65,7 +70,8 @@ class SampleFlowTest extends CharacterizationTestCase
         ]));
     }
 
-    public function testSendingSameDataAgainIsRejected(): void
+    /** @test */
+    public function 同じ内容をもう一度送ると拒否する(): void
     {
         $confirm = $this->confirm();
         $post = Browser::submit($confirm['return'], 0);
@@ -76,7 +82,8 @@ class SampleFlowTest extends CharacterizationTestCase
         ]));
     }
 
-    public function testBackFromConfirmPageRestoresInput(): void
+    /** @test */
+    public function 確認画面から戻ると入力を復元する(): void
     {
         $confirm = $this->confirm();
         $this->assertSnapshot('back', $this->runStep([
