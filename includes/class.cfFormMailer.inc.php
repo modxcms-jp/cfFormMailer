@@ -227,6 +227,10 @@ class Class_cfFormMailer
                 if (!empty($var['error']) && $var['error'] !== $this->config('upload_err_ok')) {
                     continue;
                 }
+                // 1 つの項目に 1 つのファイルだけを受ける
+                if (!is_string($var['tmp_name'] ?? null) || $var['tmp_name'] === '') {
+                    continue;
+                }
                 $confirm_tmp_name = (
                     $this->config('upload_tmp_path')
                     ? $this->cfm_upload_tmp_name($var['tmp_name'])
@@ -374,6 +378,12 @@ class Class_cfFormMailer
                 } elseif (isset($this->form[$field])) {
                     $this->form[$field] = strtr($this->form[$field], array("\r" => '', "\n" => ''));
                 }
+            }
+
+            // ファイルの項目は 1 つのファイルだけを受ける（name="xxx[]" で複数送られたものは扱わない）
+            if ($method['type'] === 'file' && !is_string($_FILES[$field]['tmp_name'] ?? '')) {
+                $this->setFormError($field, $this->adaptEncoding($method['label']), 'ファイルは 1 つだけ指定してください');
+                continue;
             }
 
             // 入力必須項目のチェック
@@ -2226,6 +2236,9 @@ class Class_cfFormMailer
     private function _def_allowtype($value, $param, $field)
     {
         $file_tmp_name = $_FILES[$field]['tmp_name'] ?? '';
+        if (!is_string($file_tmp_name)) {
+            return 'ファイルは 1 つだけ指定してください';
+        }
         if (empty($file_tmp_name) || !is_uploaded_file($file_tmp_name)) {
             return true;
         }
@@ -2268,6 +2281,9 @@ class Class_cfFormMailer
     private function _def_allowsize($value, $param, $field)
     {
         $file_tmp_name = $_FILES[$field]['tmp_name'] ?? '';
+        if (!is_string($file_tmp_name)) {
+            return 'ファイルは 1 つだけ指定してください';
+        }
         if (empty($file_tmp_name) || !is_uploaded_file($file_tmp_name)) {
             return true;
         }
