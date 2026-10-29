@@ -492,24 +492,28 @@ class Class_cfFormMailer
                     $fieldType = 'text';
             }
 
+            $pat = '';
+            $rep = '';
+            $fieldValue = $params[$fieldName] ?? '';
+
             // テキストボックス
             if ($tag[1] === 'input' && $fieldType === 'text') {
                 if (count($m_value) > 1) {
                     $pat = $m_value[0];
-                    $rep = 'value="' . $this->encodeHTML($params[$fieldName]) . '"';
+                    $rep = 'value="' . $this->encodeHTML($fieldValue) . '"';
                 } else {
                     $pat = $tag[2];
-                    $rep = $tag[2] . ' value="' . $this->encodeHTML($params[$fieldName]) . '"';
+                    $rep = $tag[2] . ' value="' . $this->encodeHTML($fieldValue) . '"';
                 }
                 // チェックボックス
             } elseif ($tag[1] === 'input' && $fieldType === 'checkbox') {
-                if (isset($m_value[2]) && ($m_value[2] == $params[$fieldName] || (is_array($params[$fieldName]) && in_array($m_value[2], $params[$fieldName])))) {
+                if (isset($m_value[2]) && ($m_value[2] == $fieldValue || (is_array($fieldValue) && in_array($m_value[2], $fieldValue)))) {
                     $pat = $tag[2];
                     $rep = $tag[2] . ' checked="checked"';
                 }
                 // ラジオボタン
             } elseif ($tag[1] === 'input' && $fieldType === 'radio') {
-                if (isset($m_value[2]) && $m_value[2] == $params[$fieldName]) {
+                if (isset($m_value[2]) && $m_value[2] == $fieldValue) {
                     $pat = $tag[2];
                     $rep = $tag[2] . ' checked="checked"';
                 }
@@ -536,7 +540,7 @@ class Class_cfFormMailer
                             ),
                             $tag[0]
                         );
-                        if ($v[3] == $params[$fieldName]) {
+                        if ($v[3] == $fieldValue) {
                             $tag[0] = str_replace(
                                 $v[0],
                                 str_replace(
@@ -552,14 +556,14 @@ class Class_cfFormMailer
                 }
                 // 複数行テキスト
             } elseif ($tag[1] === 'textarea') {
-                if ($params[$fieldName]) {
+                if ($fieldValue) {
                     $pat = $tag[0];
                     $rep = sprintf(
                         '<%s%s%s>%s</textarea>',
                         $tag[1],
                         $tag[2],
                         $tag[3],
-                        $this->encodeHTML($params[$fieldName])
+                        $this->encodeHTML($fieldValue)
                     );
                 }
             }
@@ -849,8 +853,8 @@ class Class_cfFormMailer
             $mails = explode(',', $this->config('admin_mail'));
         } else {
             $dynamic_send_to = sessionv('dynamic_send_to');
-            $field_value = $this->form[$this->config('dynamic_send_to_field')];
-            if (empty($dynamic_send_to) || !$field_value) {
+            $field_value = $this->form[$this->config('dynamic_send_to_field')] ?? '';
+            if (empty($dynamic_send_to) || !$field_value || !is_scalar($field_value) || empty($dynamic_send_to[$field_value])) {
                 $mails = explode(',', $this->config('admin_mail'));
             } else {
                 $mails = explode(',', $dynamic_send_to[$field_value]);
@@ -927,7 +931,7 @@ class Class_cfFormMailer
                 $groups = explode(',', $g_match[1]);
                 $isErr = 0;
                 foreach ($groups as $group) {
-                    $isErr = $errors['error.' . strtr($group, array(' ' => ''))] ? 1 : $isErr;
+                    $isErr = !empty($errors['error.' . strtr($group, array(' ' => ''))]) ? 1 : $isErr;
                 }
                 if ($isErr) {
                     $html = str_replace($tag[0], $tag[2], $html);
@@ -1537,7 +1541,7 @@ class Class_cfFormMailer
                 $html,
                 $matches
             );
-            if ($matches[2]) {
+            if (!empty($matches[2])) {
                 preg_match_all(
                     "@<option.+?</option>@uims",
                     $matches[2],
@@ -1555,7 +1559,7 @@ class Class_cfFormMailer
             );
         }
 
-        if (!$m_options[0]) {
+        if (empty($m_options[0])) {
             return null;
         }
 
@@ -1731,7 +1735,7 @@ class Class_cfFormMailer
             return '';
         }
         if (strpos($this->config('reply_to'), '+') === false) {
-            return $this->form[$this->config('reply_to')];
+            return $this->form[$this->config('reply_to')] ?? '';
         }
 
         $reply_to = array();
@@ -2069,6 +2073,7 @@ class Class_cfFormMailer
         if (!preg_match("/([0-9]+)?(-)?([0-9]+)?/", $param, $match)) {
             return true;
         }
+        $match += array('', '', '', '');
 
         if ($match[1] && empty($match[2]) && empty($match[3])) {
             if (mb_strlen($value) != $match[1]) {
@@ -2127,6 +2132,7 @@ class Class_cfFormMailer
         if (!preg_match('/([0-9-]+)?(~)?([0-9-]+)?/', $param, $match)) {
             return true;
         }
+        $match += array('', '', '', '');
 
         if ($match[1] && !$match[2] && !$match[3]) {
             if ($match[1] < $value) {
@@ -2148,7 +2154,7 @@ class Class_cfFormMailer
                 return '入力値が範囲外です';
             }
 
-            if ($match[3] < $value) {
+            if ($match[3] !== '' && $match[3] < $value) {
                 return '入力値が範囲外です';
             }
             return true;
@@ -2163,7 +2169,7 @@ class Class_cfFormMailer
      */
     private function _def_sameas($value, $param, $field)
     {
-        if ($value == $this->form[$param]) {
+        if ($value == ($this->form[$param] ?? null)) {
             return true;
         }
 
@@ -2171,7 +2177,7 @@ class Class_cfFormMailer
         return sprintf(
             '&laquo; %s &raquo; と一致しません',
             $this->adaptEncoding(
-                $this->parsedForm[$param]['label']
+                $this->parsedForm[$param]['label'] ?? $param
             )
         );
     }
@@ -2300,7 +2306,7 @@ class Class_cfFormMailer
      * @param $field
      * @return bool
      */
-    private function _def_convert($value, $param = 'K', $field)
+    private function _def_convert($value, $param, $field)
     {
         if (!$param) {
             $param = 'K';
@@ -2322,8 +2328,11 @@ class Class_cfFormMailer
      * @param $field
      * @return bool
      */
-    private function _def_zenhan($value, $param = 'VKas', $field)
+    private function _def_zenhan($value, $param, $field)
     {
+        if (!$param) {
+            $param = 'VKas';
+        }
         $this->form[$field] = mb_convert_kana(
             $this->form[$field] ?? '',
             $param,
@@ -2342,8 +2351,11 @@ class Class_cfFormMailer
      * @param $field
      * @return bool
      */
-    private function _def_hanzen($value, $param = 'VKAS', $field)
+    private function _def_hanzen($value, $param, $field)
     {
+        if (!$param) {
+            $param = 'VKAS';
+        }
         $this->form[$field] = mb_convert_kana(
             $this->form[$field] ?? '',
             $param,
