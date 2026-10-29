@@ -25,12 +25,14 @@ class TwoFormConfirmTest extends CharacterizationTestCase
         ]);
     }
 
-    public function testConfirmPageGetsHiddenFieldsInBothForms(): void
+    /** @test */
+    public function 確認画面の両方のフォームにhiddenとトークンが入る(): void
     {
         $this->assertSnapshot('conf_valid', $this->confirm());
     }
 
-    public function testSendFromFirstForm(): void
+    /** @test */
+    public function 一つ目のフォームから送信する(): void
     {
         $confirm = $this->confirm();
         $this->assertSnapshot('send_ok', $this->runStep([
@@ -40,7 +42,8 @@ class TwoFormConfirmTest extends CharacterizationTestCase
         ]));
     }
 
-    public function testBackFromSecondForm(): void
+    /** @test */
+    public function 二つ目のフォームから戻る(): void
     {
         $confirm = $this->confirm();
         $this->assertSnapshot('back', $this->runStep([
