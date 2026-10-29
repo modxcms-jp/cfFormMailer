@@ -1,0 +1,19 @@
+{
+    "name": "modxcms-jp/cfformmailer",
+    "description": "Mail form snippet for MODX Evolution (development tooling only; not needed at runtime)",
+    "type": "project",
+    "require-dev": {
+        "phpunit/phpunit": "^9.6"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "CfFormMailer\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "platform": {
+            "php": "7.4.33"
+        },
+        "sort-packages": true
+    }
+}
