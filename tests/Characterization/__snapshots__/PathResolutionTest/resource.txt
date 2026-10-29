@@ -1,0 +1,7 @@
+== return ==
+<p>リソース 7 の入力画面</p>
+<form method="post"><input type="hidden" name="_mode" value="conf" /><input type="text" name="name" /></form>
+
+== session ==
+array (
+)

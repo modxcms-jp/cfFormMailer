@@ -1,0 +1,12 @@
+== return ==
+<p>お名前: 山田</p>
+<p>添付:  ()</p>
+<form action="[~[*id*]~]" method="post"><input type="hidden" name="_mode" value="send" />
+  <input type="submit" value="送信" />
+<input type="hidden" name="name" value="山田" /><input type="hidden" name="_cffm_token" value="<TOKEN>" /></form>
+
+== session ==
+array (
+  '_cffm_token' => '<TOKEN>',
+  'dynamic_send_to' => NULL,
+)
