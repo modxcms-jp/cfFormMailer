@@ -19,6 +19,7 @@ cfFormMailerの全バージョンの変更履歴を記録します。
 - 1 つのファイル項目に複数のファイルが送られたときの検証（#9）
 - 存在しない配列キーの読み取りによる Warning・Deprecated（`<iferror.(a,b)>` のグループ指定、送信先の切り替え、`len(5-)`・`range(1~)` の省略形、`zenhan`・`hanzen` の既定値など）（#10）
 - テキストフィルタ `num`・`dateformat`・`sprintf` の PHP 8 での TypeError と、`dateformat` の `strftime()` の Deprecated（#11）
+- 同梱のサンプル（`forms/sample/config.ini`・`config.with_comment.ini`）のテンプレートのパスが解決できなかった（`@FILE:tpl/...`）。MODX のルートからのパスに直した
 
 ---
 
