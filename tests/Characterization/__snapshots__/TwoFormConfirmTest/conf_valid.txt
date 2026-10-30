@@ -1,0 +1,128 @@
+== return ==
+<h2>以下の内容で送信します。<br />内容を確認し、「送信する」ボタンを押してください。</h2>
+<div id="cf_sample_form">
+  <fieldset><legend>個人情報</legend>
+  <table>
+    <tbody>
+      <tr>
+        <th>お名前</th>
+        <td>山田 太郎</td>
+      </tr>
+      <tr>
+        <th>会社名</th>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <th>メールアドレス</th>
+        <td>taro@example.com</td>
+      </tr>
+      <tr>
+        <th>性別</th>
+        <td>男性</td>
+      </tr>
+      <tr>
+        <th>郵便番号</th>
+        <td>123 - 4567</td>
+      </tr>
+      <tr>
+        <th>住所</th>
+        <td>東京都 千代田区 1-1 &nbsp;</td>
+      </tr>
+      <tr>
+        <th>電話番号</th>
+        <td>03-1234-5678</td>
+      </tr>
+    </tbody>
+  </table>
+  </fieldset>
+  <fieldset><legend>お問い合わせ内容</legend>
+  <table>
+    <tbody>
+      <tr>
+        <th>お問い合わせ内容</th>
+        <td>その他</td>
+      </tr>
+      <tr>
+        <th>メッセージ</th>
+        <td>1行目<br />
+2行目 &lt;b&gt;&amp;&lt;/b&gt; &quot;引用&quot;</td>
+      </tr>
+      <tr>
+        <th>優先する連絡方法</th>
+        <td>メール</td>
+      </tr>
+    </tbody>
+  </table>
+  </fieldset>
+  <fieldset><legend>アンケート</legend>
+  <table>
+    <tbody>
+      <tr>
+        <th>既にお持ちの商品</th>
+        <td><ul><li>ライトサーベル</li><li>ですの音</li></ul></td>
+      </tr>
+      <tr>
+        <th>印象に残った商品</th>
+        <td><ul><li>なし</li></ul></td>
+      </tr>
+    </tbody>
+  </table>
+  </fieldset>
+
+  <form action="[~[*id*]~]" method="post"><input type="hidden" name="_mode" value="send" />  
+    <p class="buttons"><input type="submit" value="　送信する　" /></p>
+  <input type="hidden" name="name_f" value="山田" />
+<input type="hidden" name="name_l" value="太郎" />
+<input type="hidden" name="company" value="" />
+<input type="hidden" name="email1" value="taro" />
+<input type="hidden" name="email2" value="@docomo.ne.jp" />
+<input type="hidden" name="email" value="taro@example.com" />
+<input type="hidden" name="gender" value="男性" />
+<input type="hidden" name="zip1" value="123" />
+<input type="hidden" name="zip2" value="4567" />
+<input type="hidden" name="pref" value="東京都" />
+<input type="hidden" name="addr1" value="千代田区" />
+<input type="hidden" name="addr2" value="1-1" />
+<input type="hidden" name="addr3" value="" />
+<input type="hidden" name="tel" value="03-1234-5678" />
+<input type="hidden" name="tel_confirm" value="03-1234-5678" />
+<input type="hidden" name="summary" value="その他" />
+<input type="hidden" name="message" value="1行目
+2行目 &lt;b&gt;&amp;&lt;/b&gt; &quot;引用&quot;" />
+<input type="hidden" name="way" value="メール" />
+<input type="hidden" name="own[]" value="ライトサーベル" />
+<input type="hidden" name="own[]" value="ですの音" />
+<input type="hidden" name="impression[]" value="なし" />
+<input type="hidden" name="veri" value="abcd" /><input type="hidden" name="_cffm_token" value="<TOKEN>" /></form>
+  <form action="[~[*id*]~]" method="post"><input type="hidden" name="_mode" value="send" />
+    <p class="buttons"><input type="submit" name="return" value="戻る" /></p>
+  <input type="hidden" name="name_f" value="山田" />
+<input type="hidden" name="name_l" value="太郎" />
+<input type="hidden" name="company" value="" />
+<input type="hidden" name="email1" value="taro" />
+<input type="hidden" name="email2" value="@docomo.ne.jp" />
+<input type="hidden" name="email" value="taro@example.com" />
+<input type="hidden" name="gender" value="男性" />
+<input type="hidden" name="zip1" value="123" />
+<input type="hidden" name="zip2" value="4567" />
+<input type="hidden" name="pref" value="東京都" />
+<input type="hidden" name="addr1" value="千代田区" />
+<input type="hidden" name="addr2" value="1-1" />
+<input type="hidden" name="addr3" value="" />
+<input type="hidden" name="tel" value="03-1234-5678" />
+<input type="hidden" name="tel_confirm" value="03-1234-5678" />
+<input type="hidden" name="summary" value="その他" />
+<input type="hidden" name="message" value="1行目
+2行目 &lt;b&gt;&amp;&lt;/b&gt; &quot;引用&quot;" />
+<input type="hidden" name="way" value="メール" />
+<input type="hidden" name="own[]" value="ライトサーベル" />
+<input type="hidden" name="own[]" value="ですの音" />
+<input type="hidden" name="impression[]" value="なし" />
+<input type="hidden" name="veri" value="abcd" /><input type="hidden" name="_cffm_token" value="<TOKEN>" /></form>
+</div>
+
+== session ==
+array (
+  '_cffm_token' => '<TOKEN>',
+  'dynamic_send_to' => NULL,
+)
