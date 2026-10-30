@@ -58,11 +58,6 @@ class Class_cfFormMailer
         $this->form = $this->getFormVariables($_POST);
         $this->error_message = '';
         $this->formError = array();
-
-        // uploadクラス読み込み（設置フォルダの直下に置く）
-        if (is_file(CFM_PATH . 'class.upload.php')) {
-            include_once CFM_PATH . 'class.upload.php';
-        }
     }
 
     public function renderForm()
@@ -1877,7 +1872,9 @@ class Class_cfFormMailer
 
     /**
      * ファイルのMIMEタイプを取得
-     * class.upload.php 使用推奨
+     *
+     * ファイルの中身から判定する（Fileinfo）。Fileinfo が使えない環境では、
+     * 画像は getimagesize()、それ以外はブラウザが送ってきた種類を使う。
      *
      * @param string  $filename MIMEタイプを調べるファイル
      * @param string  $field  アップロードされたフィールド名
@@ -1885,16 +1882,15 @@ class Class_cfFormMailer
      */
     private function _getMimeType($filename, $field = '')
     {
-        if (class_exists('upload')) {
-            // class.upload.php使用
-            $up = new upload($filename);
-            if ($up->uploaded) {
-                return $up->file_src_mime;
+        if (class_exists('finfo')) {
+            $finfo = new finfo(FILEINFO_MIME_TYPE);
+            $mime = @$finfo->file($filename);
+            if (is_string($mime) && $mime !== '') {
+                return $mime;
             }
-            return false;
         }
 
-        // class.upload.php未使用。image以外の結果はあまり信用できない
+        // Fileinfo が使えないとき。image以外の結果はあまり信用できない
         $size = @getimagesize($filename);
         if ($size === false) {
             if (isset($_FILES[$field]['type']) && $_FILES[$field]['type']) {

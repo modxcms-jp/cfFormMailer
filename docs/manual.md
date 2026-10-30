@@ -21,10 +21,7 @@
     - phpmailer_ex.php （※v1.1r2で追加）
     - additionalMethods.inc.php (※独自検証メソッドまたは独自フィルターメソッドを追加しない場合は、アップロードしなくても構いません。）
 
-2. （ファイルアップロードを使用する場合） [class.upload.php](http://www.verot.net/php_class_upload.htm)を/assets/snippets/cfFormMailer/フォルダにアップロードします。（任意）
-    ※「[ユーザーがアップロードしたファイルの添付送信](#ユーザーがアップロードしたファイルの添付送信)」参照
-    class.upload.phpはColin Verot氏作の画像アップロードライブラリです。
-  ダウンロード先： [http://www.verot.net/php_class_upload_download.htm](http://www.verot.net/php_class_upload_download.htm)
+2. （ファイルアップロードを使用する場合） 追加のライブラリは要りません。アップロードされたファイルの MIME タイプは、PHP の Fileinfo（標準で同梱）でファイルの中身から判定します。以前は class.upload.php の追加を推奨していましたが、今は不要です（置いてあっても使いません）。
 
 3. （ファイルアップロードを使用する場合） プラグインcfFileViewをインストールします。
   「[ユーザーがアップロードしたファイルの添付送信](#ユーザーがアップロードしたファイルの添付送信)」を参照してください。
@@ -584,12 +581,7 @@ attach_fileは半角英数字に限定されるため、日本語名で送信し
 
 #### [ファイルの追加]
 
-**！画像アップロードライブラリclass.upload.phpの追加を推奨します！**
-
-アップロードされたファイルのMIMEタイプ判別（と、将来の拡張）のために、Colin Verot氏作の画像アップロードライブラリであるclass.upload.phpを使用することを推奨します。
-一応無くても動作するようにはなっていますが、画像以外のファイルのアップロードを許可する場合は、最適なPHPの動作環境（[Fileinfo関数](http://www.php.net/manual/ja/book.fileinfo.php)が利用できること）とともに、このclass.upload.phpを使用するようにしてください。
-
-書庫ファイル内には格納しておりませんので、[class.upload.phpのページ](http://www.verot.net/php_class_upload.htm)からダウンロードし、/assets/snippets/cfFormMailer/フォルダ内にアップロードしてください。
+アップロードされたファイルの MIME タイプは、PHP の Fileinfo（標準で同梱）でファイルの中身から判定します。以前は class.upload.php の追加を推奨していましたが、今は不要です（置いてあっても使いません）。
 
 #### [確認画面でのファイル指定]
 

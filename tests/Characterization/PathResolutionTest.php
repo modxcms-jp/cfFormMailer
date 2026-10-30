@@ -10,7 +10,8 @@ use CfFormMailer\Tests\Harness\SiteFixture;
  *
  * ディレクトリ構成を変えると、ここのスナップショットだけが変わる想定。
  * - @FILE: は CFM_PATH（bootstrap.php のあるフォルダ）→ MODX のルートの順に探す
- * - additionalMethods.inc.php は CFM_PATH から、class.upload.php はクラスのファイルと同じフォルダから読む
+ * - additionalMethods.inc.php は CFM_PATH から読む
+ * - class.upload.php は置いても使わない（MIME タイプは Fileinfo で判定する）
  * - アップロードの一時ファイルは CFM_PATH/tmp に置く
  */
 class PathResolutionTest extends CharacterizationTestCase
@@ -21,7 +22,7 @@ class PathResolutionTest extends CharacterizationTestCase
     /** 名前の項目に付けた t3mark の検証。読まれたら必ずエラーになる */
     private const USER_VALIDATOR = "<?php\nfunction _validate_t3mark(\$value, \$param)\n{\n    return 'additionalMethods.inc.php の検証が呼ばれた';\n}\n";
 
-    /** class.upload.php の代わり。読まれたら MIME タイプがこの値になる */
+    /** class.upload.php の代わり。使われたら MIME タイプがこの値になる */
     private const FAKE_UPLOAD_CLASS = "<?php\nclass upload\n{\n    public \$uploaded = true;\n    public \$file_src_mime = 'text/x-from-class-upload';\n    public function __construct(\$file)\n    {\n    }\n}\n";
 
     private function confirmWithUpload(array $input = []): array
@@ -144,18 +145,10 @@ class PathResolutionTest extends CharacterizationTestCase
     }
 
     /** @test */
-    public function 設置フォルダの直下のclass_uploadを読むか(): void
+    public function 設置フォルダの直下にclass_uploadを置いても使わない(): void
     {
         $this->assertSnapshot('class_upload_in_root', $this->confirmWithUpload([
             'extra_files' => ['class.upload.php' => self::FAKE_UPLOAD_CLASS],
-        ]));
-    }
-
-    /** @test */
-    public function includesフォルダのclass_uploadを読むか(): void
-    {
-        $this->assertSnapshot('class_upload_in_includes', $this->confirmWithUpload([
-            'extra_files' => ['includes/class.upload.php' => self::FAKE_UPLOAD_CLASS],
         ]));
     }
 }
