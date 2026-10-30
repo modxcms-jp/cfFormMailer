@@ -21,7 +21,7 @@ if (!isset($config)) {
 
 define('CFM_PATH', __DIR__ . '/');
 
-include_once(CFM_PATH . 'class.cfFormMailer.inc.php');
+require_once CFM_PATH . 'src/autoload.php';
 
 $mf = new Class_cfFormMailer($modx);
 $mf->parseConfig($config);

@@ -1,6 +1,6 @@
 == return ==
 <p>お名前: 山田</p>
-<p>添付: upload.txt (TXT)</p>
+<p>添付: upload.txt ()</p>
 <form action="[~[*id*]~]" method="post"><input type="hidden" name="_mode" value="send" />
   <input type="submit" value="送信" />
 <input type="hidden" name="name" value="山田" /><input type="hidden" name="_cffm_token" value="<TOKEN>" /></form>
@@ -11,8 +11,8 @@ array (
   array (
     'attach' => 
     array (
-      'mime' => 'text/plain',
-      'path' => '<SITE>/assets/snippets/cfFormMailer/includes/tmp/upload.txt',
+      'mime' => 'text/x-from-class-upload',
+      'path' => '<SITE>/assets/snippets/cfFormMailer/tmp/upload.txt',
     ),
   ),
   '_cffm_token' => '<TOKEN>',
@@ -24,6 +24,6 @@ array (
   0 => 
   array (
     0 => '<SITE>/assets/snippets/cfFormMailer/forms/_t/paths/upload.txt',
-    1 => '<SITE>/assets/snippets/cfFormMailer/includes/tmp/upload.txt',
+    1 => '<SITE>/assets/snippets/cfFormMailer/tmp/upload.txt',
   ),
 )

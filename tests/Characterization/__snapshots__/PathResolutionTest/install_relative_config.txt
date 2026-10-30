@@ -1,8 +1,10 @@
 == return ==
-false
 
-== php_errors ==
-Deprecated: trim(): Passing null to parameter #1 ($string) of type string is deprecated
+<form action="[~[*id*]~]" method="post" enctype="multipart/form-data"><input type="hidden" name="_mode" value="conf" />
+  <input type="text" name="name" />
+  <input type="file" name="attach" />
+  <input type="submit" value="確認" />
+</form>
 
 == session ==
 array (

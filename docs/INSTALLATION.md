@@ -50,11 +50,14 @@ cfFormMailerのインストール手順を説明します。
 
 # 2. 以下のファイルをアップロード
 /assets/snippets/cfFormMailer/
-├── includes/
-│   ├── class.cfFormMailer.inc.php  # メインクラス
-│   └── bootstrap.php                # エントリーポイント
+├── bootstrap.php                    # エントリーポイント（スニペットから読み込む）
+├── src/                             # クラス
+│   ├── autoload.php
+│   └── Class_cfFormMailer.php       # メインクラス
+├── additionalMethods.inc.php        # カスタム検証・フィルター（任意。extras/ の見本を写して作る）
+├── class.upload.php                 # MIME タイプの判別（任意。下記「ファイルアップロード機能」）
 ├── extras/
-│   ├── additionalMethods.inc.php   # カスタム検証・フィルター（オプション）
+│   ├── additionalMethods.inc.php   # カスタム検証・フィルターの見本
 │   └── plugin.cfFileView.php       # ファイル表示プラグイン（オプション）
 └── forms/
     └── sample/                      # サンプルテンプレート
@@ -119,14 +122,14 @@ reply_to = email
 reply_subject = お問い合わせありがとうございます
 
 # テンプレート設定
-tmpl_input = @FILE:assets/snippets/cfFormMailer/forms/myform/web_form.tpl.html
-tmpl_conf = @FILE:assets/snippets/cfFormMailer/forms/myform/web_confirm.tpl.html
-tmpl_comp = @FILE:assets/snippets/cfFormMailer/forms/myform/web_thanks.tpl.html
-tmpl_mail_admin = @FILE:assets/snippets/cfFormMailer/forms/myform/mail_receive.tpl.txt
-tmpl_mail_reply = @FILE:assets/snippets/cfFormMailer/forms/myform/mail_autoreply.tpl.txt
+tmpl_input = @FILE:forms/myform/web_form.tpl.html
+tmpl_conf = @FILE:forms/myform/web_confirm.tpl.html
+tmpl_comp = @FILE:forms/myform/web_thanks.tpl.html
+tmpl_mail_admin = @FILE:forms/myform/mail_receive.tpl.txt
+tmpl_mail_reply = @FILE:forms/myform/mail_autoreply.tpl.txt
 ```
 
-`@FILE:` のパスは、MODX のルート（または `includes/`）からの相対で探します。
+`@FILE:` のパスは、設置フォルダ（`assets/snippets/cfFormMailer/`）からの相対で探し、見つからなければ MODX のルートからの相対で探します。`@FILE:assets/snippets/cfFormMailer/forms/myform/web_form.tpl.html` のように MODX のルートから書いても読めます。
 
 #### 方法B: チャンクとして作成
 
@@ -166,7 +169,7 @@ forms/myform/
 #### ファイル形式の設定を使用する場合
 
 ```php
-[!cfFormMailer?&config=`@FILE:assets/snippets/cfFormMailer/forms/myform/config.ini`!]
+[!cfFormMailer?&config=`@FILE:forms/myform/config.ini`!]
 ```
 
 #### チャンク形式の設定を使用する場合
@@ -194,11 +197,11 @@ forms/myform/
 # 1. ダウンロード
 wget http://www.verot.net/php_class_upload_download.htm
 
-# 2. 解凍して配置
-cp class.upload.php /assets/snippets/cfFormMailer/includes/
+# 2. 解凍して配置（設置フォルダの直下）
+cp class.upload.php /assets/snippets/cfFormMailer/
 
 # 3. パーミッション設定
-chmod 644 /assets/snippets/cfFormMailer/includes/class.upload.php
+chmod 644 /assets/snippets/cfFormMailer/class.upload.php
 ```
 
 #### 2. cfFileViewプラグインのインストール
@@ -278,6 +281,17 @@ vericode = 1
 
 ## バージョンアップ
 
+### v1.7.0 から次の版へ
+
+```bash
+# ファイルを置き換え（forms/ の自分のフォームと、additionalMethods.inc.php・class.upload.php は残す）
+cp -r new_version/* /assets/snippets/cfFormMailer/
+```
+
+- スニペットのコードは変えなくてよい（入口は v1.7.0 と同じ `assets/snippets/cfFormMailer/bootstrap.php`）
+- クラスは `src/` に移った。設置フォルダの直下に残る古い `class.cfFormMailer.inc.php` は使われないので、消してよい
+- `@FILE:` のパス、`additionalMethods.inc.php`・`class.upload.php`・`tmp/` の場所は v1.7.0 と同じ（設置フォルダの直下）
+
 ### v1.6からv1.7へ
 
 ```bash
@@ -348,7 +362,7 @@ cp -r new_version/* /assets/snippets/cfFormMailer/
 
    ```bash
    # ファイルの存在確認
-   ls -la /assets/snippets/cfFormMailer/includes/class.cfFormMailer.inc.php
+   ls -la /assets/snippets/cfFormMailer/bootstrap.php /assets/snippets/cfFormMailer/src/Class_cfFormMailer.php
    ```
 
 ---
@@ -361,7 +375,7 @@ cp -r new_version/* /assets/snippets/cfFormMailer/
 
 ```php
 # configパラメータを追加
-[!cfFormMailer?&config=`@FILE:assets/snippets/cfFormMailer/forms/myform/config.ini`!]
+[!cfFormMailer?&config=`@FILE:forms/myform/config.ini`!]
 ```
 
 ---
@@ -376,7 +390,7 @@ cp -r new_version/* /assets/snippets/cfFormMailer/
 
    ```ini
    # config.ini を確認
-   tmpl_input = @FILE:assets/snippets/cfFormMailer/forms/myform/web_form.tpl.html
+   tmpl_input = @FILE:forms/myform/web_form.tpl.html
 
    # 実際のファイル存在確認
    ls -la /assets/snippets/cfFormMailer/forms/myform/web_form.tpl.html
