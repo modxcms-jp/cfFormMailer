@@ -20,3 +20,7 @@ insert_final_newline = ignore
 
 [*.php]
 indent_size = 4
+
+# テストのスナップショットは出力をそのまま写したものなので、行末の空白も消さない
+[tests/**/__snapshots__/**]
+trim_trailing_whitespace = false

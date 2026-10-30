@@ -1,0 +1,39 @@
+== return ==
+<p style="color:#cc0000;background:#fff;font-weight:bold;">SYSTEM ERROR::すでに送信しています</p>
+
+== session ==
+array (
+  '_cffm_recently_send' => 
+  array (
+    'addr1' => '千代田区',
+    'addr2' => '1-1',
+    'addr3' => '',
+    'company' => '',
+    'email' => 'taro@example.com',
+    'email1' => 'taro',
+    'email2' => '@docomo.ne.jp',
+    'gender' => '男性',
+    'impression' => 
+    array (
+      0 => 'なし',
+    ),
+    'message' => '1行目
+2行目 <b>&</b> "引用"',
+    'name_f' => '山田',
+    'name_l' => '太郎',
+    'own' => 
+    array (
+      0 => 'ライトサーベル',
+      1 => 'ですの音',
+    ),
+    'pref' => '東京都',
+    'summary' => 'その他',
+    'tel' => '03-1234-5678',
+    'tel_confirm' => '03-1234-5678',
+    'veri' => 'abcd',
+    'way' => 'メール',
+    'zip1' => '123',
+    'zip2' => '4567',
+  ),
+  'dynamic_send_to' => NULL,
+)

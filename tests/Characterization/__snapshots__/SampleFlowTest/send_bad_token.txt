@@ -1,0 +1,7 @@
+== return ==
+<p style="color:#cc0000;background:#fff;font-weight:bold;">SYSTEM ERROR::画面遷移が正常に行われませんでした</p>
+
+== session ==
+array (
+  'dynamic_send_to' => NULL,
+)
