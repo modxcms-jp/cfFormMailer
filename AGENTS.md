@@ -60,12 +60,13 @@ MODX Evolutionで動作する高機能なメールフォームスニペット。
 ### 現在の構造 (v1.7.x)
 
 ```
-cfFormMailer/
-├── includes/
-│   ├── class.cfFormMailer.inc.php  # メインクラス（2,481行）★
-│   └── bootstrap.php                # エントリーポイント
+cfFormMailer/                        # = assets/snippets/cfFormMailer/ の中身
+├── bootstrap.php                    # エントリーポイント（CFM_PATH = このフォルダ）
+├── src/
+│   ├── autoload.php                 # Class_cfFormMailer と CfFormMailer\ のクラスを読む
+│   └── Class_cfFormMailer.php       # メインクラス ★
 ├── extras/
-│   ├── additionalMethods.inc.php   # カスタム検証・フィルター
+│   ├── additionalMethods.inc.php   # カスタム検証・フィルターの見本（使うときは直下に写す）
 │   └── plugin.cfFileView.php       # ファイル表示プラグイン
 ├── forms/
 │   └── sample/                      # サンプルテンプレート
@@ -78,7 +79,7 @@ cfFormMailer/
     └── ...
 ```
 
-**★重要**: `class.cfFormMailer.inc.php` が全てのロジックを含む巨大クラス
+**★重要**: `src/Class_cfFormMailer.php` が全てのロジックを含む巨大クラス
 
 ---
 │   ├── Mail/
@@ -354,7 +355,7 @@ public function get(string $filterName): ?FilterInterface
 #### Before (v1.7.x)
 
 ```php
-// includes/class.cfFormMailer.inc.php (2,481行)
+// src/Class_cfFormMailer.php
 
 private function _def_email($value, $param, $field)
 {
@@ -648,7 +649,7 @@ class ValidationException extends RuntimeException
 
 ```php
 // ❌ 削除してはいけない
-// includes/class.cfFormMailer.inc.php の public メソッド
+// src/Class_cfFormMailer.php の public メソッド
 
 // ✅ レガシーラッパーとして残す
 // src/Legacy/Class_cfFormMailer.php

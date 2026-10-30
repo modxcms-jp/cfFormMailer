@@ -59,9 +59,9 @@ class Class_cfFormMailer
         $this->error_message = '';
         $this->formError = array();
 
-        // uploadクラス読み込み
-        if (is_file(__DIR__ . '/class.upload.php')) {
-            include_once __DIR__ . '/class.upload.php';
+        // uploadクラス読み込み（設置フォルダの直下に置く）
+        if (is_file(CFM_PATH . 'class.upload.php')) {
+            include_once CFM_PATH . 'class.upload.php';
         }
     }
 

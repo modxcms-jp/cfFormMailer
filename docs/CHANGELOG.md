@@ -12,6 +12,8 @@ cfFormMailerの全バージョンの変更履歴を記録します。
 ### Changed
 
 - **送信メールの文字コードの既定を `utf-8` に変更**（`mail_charset` が未指定・空欄の場合も `utf-8`）。本文に合わせて PHPMailer の `CharSet`・`Encoding` を指定する。JIS で送る場合は `mail_charset = iso-2022-jp` を指定する（#7）
+- **ファイルの構成を変更**：入口の `bootstrap.php` は v1.7.0 と同じく設置フォルダの直下に置き、クラスは `src/` に移した（`src/Class_cfFormMailer.php`）。スニペットのコードは v1.7.0 から変えなくてよい。`@FILE:` を設置フォルダ → MODX のルートの順に探すこと、`additionalMethods.inc.php`・`class.upload.php`・`tmp/` を設置フォルダの直下に置くことも v1.7.0 と同じ
+- 同梱のサンプルの確認画面を、1 つのフォームに「送信する」と「戻る」のボタンを置く形にした（#16）
 
 ### Fixed
 
@@ -19,7 +21,7 @@ cfFormMailerの全バージョンの変更履歴を記録します。
 - 1 つのファイル項目に複数のファイルが送られたときの検証（#9）
 - 存在しない配列キーの読み取りによる Warning・Deprecated（`<iferror.(a,b)>` のグループ指定、送信先の切り替え、`len(5-)`・`range(1~)` の省略形、`zenhan`・`hanzen` の既定値など）（#10）
 - テキストフィルタ `num`・`dateformat`・`sprintf` の PHP 8 での TypeError と、`dateformat` の `strftime()` の Deprecated（#11）
-- 同梱のサンプル（`forms/sample/config.ini`・`config.with_comment.ini`）のテンプレートのパスが解決できなかった（`@FILE:tpl/...`）。MODX のルートからのパスに直した
+- 同梱のサンプル（`forms/sample/config.ini`・`config.with_comment.ini`）のテンプレートのパスが解決できなかった（`@FILE:tpl/...`）。設置フォルダからのパス（`@FILE:forms/sample/...`）に直した
 
 ---
 
