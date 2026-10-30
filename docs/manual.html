@@ -48,10 +48,7 @@ strong { font-size: large;}
     <li>additionalMethods.inc.php (※独自検証メソッドまたは独自フィルターメソッドを追加しない場合は、アップロードしなくても構いません。）</li>
     </ul>
   </li>
-  <li>（ファイルアップロードを使用する場合） <a href="http://www.verot.net/php_class_upload.htm" target="_blank">class.upload.php</a>を/assets/snippets/cfFormMailer/フォルダにアップロードします。（任意） <br />
-    ※「<a href="#upload">ユーザーがアップロードしたファイルの添付送信</a>」参照<br />
-    class.upload.phpはColin Verot氏作の画像アップロードライブラリです。<br />
-  ダウンロード先： <a href="http://www.verot.net/php_class_upload_download.htm" target="_blank">http://www.verot.net/php_class_upload_download.htm</a></li>
+  <li>（ファイルアップロードを使用する場合） 追加のライブラリは要りません。アップロードされたファイルの MIME タイプは、PHP の Fileinfo（標準で同梱）でファイルの中身から判定します。以前は class.upload.php の追加を推奨していましたが、今は不要です（置いてあっても使いません）。</li>
   <li>（ファイルアップロードを使用する場合） プラグインcfFileViewをインストールします。<br />
   「<a href="#upload">ユーザーがアップロードしたファイルの添付送信</a>」を参照してください。  </li>
   <li>（送信内容を記録する場合） cfFormDBモジュールをインストールします。<br />
@@ -537,10 +534,7 @@ docomo.ne.jp / ezweb.ne.jp / softbank.ne.jp / vodafone.ne.jp / disney.ne.jp / pd
 </ol>
 <p>以上でインストール完了です。</p>
 <h4>[ファイルの追加]</h4>
-<p style="color:#f00;">！画像アップロードライブラリclass.upload.phpの追加を推奨します！</p>
-<p>アップロードされたファイルのMIMEタイプ判別（と、将来の拡張）のために、Colin Verot氏作の画像アップロードライブラリであるclass.upload.phpを使用することを推奨します。<br />
-一応無くても動作するようにはなっていますが、画像以外のファイルのアップロードを許可する場合は、最適なPHPの動作環境（<a href="http://www.php.net/manual/ja/book.fileinfo.php" target="_blank">Fileinfo関数</a>が利用できること）とともに、このclass.upload.phpを使用するようにしてください。</p>
-<p> 書庫ファイル内には格納しておりませんので、<a href="http://www.verot.net/php_class_upload.htm" target="_blank">class.upload.phpのページ</a>からダウンロードし、/assets/snippets/cfFormMailer/フォルダ内にアップロードしてください。</p>
+<p>アップロードされたファイルの MIME タイプは、PHP の Fileinfo（標準で同梱）でファイルの中身から判定します。以前は class.upload.php の追加を推奨していましたが、今は不要です（置いてあっても使いません）。</p>
 <h4>[確認画面でのファイル指定]</h4>
 <p>アップロードされたファイルは、プラグインcfFileViewを利用して表示させますので、&lt;img&gt;タグや&lt;a&gt;タグのURLとして、以下のように記述します。</p>
 <p><strong>cfFileView?field=フィールド名</strong></p>

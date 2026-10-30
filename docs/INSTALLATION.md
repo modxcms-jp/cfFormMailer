@@ -31,8 +31,7 @@ cfFormMailerのインストール手順を説明します。
 
 - **ファイルアップロード機能**:
 
-  - [class.upload.php](http://www.verot.net/php_class_upload.htm) (Colin Verot氏作)
-  - `fileinfo` 拡張（推奨）
+  - `fileinfo` 拡張（PHP に標準で同梱。アップロードされたファイルの MIME タイプを、中身から判定する）
 
 - **データベース保存機能**:
 
@@ -55,7 +54,6 @@ cfFormMailerのインストール手順を説明します。
 │   ├── autoload.php
 │   └── Class_cfFormMailer.php       # メインクラス
 ├── additionalMethods.inc.php        # カスタム検証・フィルター（任意。extras/ の見本を写して作る）
-├── class.upload.php                 # MIME タイプの判別（任意。下記「ファイルアップロード機能」）
 ├── extras/
 │   ├── additionalMethods.inc.php   # カスタム検証・フィルターの見本
 │   └── plugin.cfFileView.php       # ファイル表示プラグイン（オプション）
@@ -191,18 +189,11 @@ forms/myform/
 
 ユーザーがファイルをアップロードして送信できるようにします。
 
-#### 1. class.upload.phpのインストール
+#### 1. MIME タイプの判別
 
-```bash
-# 1. ダウンロード
-wget http://www.verot.net/php_class_upload_download.htm
+アップロードされたファイルの MIME タイプは、PHP の `fileinfo` 拡張でファイルの中身から判定します（`allowtype` の検証、確認画面の `[+項目.filetype+]`、cfFileView で使う）。`fileinfo` は PHP に標準で同梱されているので、追加のライブラリは要りません。以前の版で推奨していた `class.upload.php` は使わなくなりました。
 
-# 2. 解凍して配置（設置フォルダの直下）
-cp class.upload.php /assets/snippets/cfFormMailer/
-
-# 3. パーミッション設定
-chmod 644 /assets/snippets/cfFormMailer/class.upload.php
-```
+`fileinfo` が使えない環境では、画像は `getimagesize()` で判定し、それ以外はブラウザが送ってきた種類を使います（中身を見ないので、あまり当てになりません）。
 
 #### 2. cfFileViewプラグインのインストール
 
@@ -284,13 +275,14 @@ vericode = 1
 ### v1.7.0 から次の版へ
 
 ```bash
-# ファイルを置き換え（forms/ の自分のフォームと、additionalMethods.inc.php・class.upload.php は残す）
+# ファイルを置き換え（forms/ の自分のフォームと、additionalMethods.inc.php は残す）
 cp -r new_version/* /assets/snippets/cfFormMailer/
 ```
 
 - スニペットのコードは変えなくてよい（入口は v1.7.0 と同じ `assets/snippets/cfFormMailer/bootstrap.php`）
 - クラスは `src/` に移った。設置フォルダの直下に残る古い `class.cfFormMailer.inc.php` は使われないので、消してよい
-- `@FILE:` のパス、`additionalMethods.inc.php`・`class.upload.php`・`tmp/` の場所は v1.7.0 と同じ（設置フォルダの直下）
+- `class.upload.php` は使わなくなった（MIME タイプは `fileinfo` で判定する）。置いてあれば消してよい
+- `@FILE:` のパス、`additionalMethods.inc.php`・`tmp/` の場所は v1.7.0 と同じ（設置フォルダの直下）
 
 ### v1.6からv1.7へ
 

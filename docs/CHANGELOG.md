@@ -12,8 +12,9 @@ cfFormMailerの全バージョンの変更履歴を記録します。
 ### Changed
 
 - **送信メールの文字コードの既定を `utf-8` に変更**（`mail_charset` が未指定・空欄の場合も `utf-8`）。本文に合わせて PHPMailer の `CharSet`・`Encoding` を指定する。JIS で送る場合は `mail_charset = iso-2022-jp` を指定する（#7）
-- **ファイルの構成を変更**：入口の `bootstrap.php` は v1.7.0 と同じく設置フォルダの直下に置き、クラスは `src/` に移した（`src/Class_cfFormMailer.php`）。スニペットのコードは v1.7.0 から変えなくてよい。`@FILE:` を設置フォルダ → MODX のルートの順に探すこと、`additionalMethods.inc.php`・`class.upload.php`・`tmp/` を設置フォルダの直下に置くことも v1.7.0 と同じ
+- **ファイルの構成を変更**：入口の `bootstrap.php` は v1.7.0 と同じく設置フォルダの直下に置き、クラスは `src/` に移した（`src/Class_cfFormMailer.php`）。スニペットのコードは v1.7.0 から変えなくてよい。`@FILE:` を設置フォルダ → MODX のルートの順に探すこと、`additionalMethods.inc.php`・`tmp/` を設置フォルダの直下に置くことも v1.7.0 と同じ（#18）
 - 同梱のサンプルの確認画面を、1 つのフォームに「送信する」と「戻る」のボタンを置く形にした（#16）
+- **アップロードされたファイルの MIME タイプを、PHP の Fileinfo でファイルの中身から判定するようにした**。これまでは画像以外のファイルで、ブラウザが送ってきた種類をそのまま使っていた（`class.upload.php` を置いたときだけ中身から判定していた）。`allowtype` の検証・確認画面の `[+項目.filetype+]`・cfFileView の Content-Type の結果が、ファイルによっては変わる（例：ブラウザが `application/octet-stream` と送ってきた本物の PDF は PDF として扱われ、中身がテキストの `.pdf` は PDF として扱われなくなる）。`class.upload.php` は使わなくなった
 
 ### Fixed
 

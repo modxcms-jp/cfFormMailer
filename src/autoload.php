@@ -4,7 +4,7 @@
  *
  * - Class_cfFormMailer       → src/Class_cfFormMailer.php
  * - CfFormMailer\Foo\Bar     → src/Foo/Bar.php
- * それ以外のクラス（class.upload.php の upload など）には触らない。
+ * それ以外のクラスには触らない（利用者のほかのコードのクラスを横取りしない）。
  */
 
 if (!defined('CFM_AUTOLOAD')) {
