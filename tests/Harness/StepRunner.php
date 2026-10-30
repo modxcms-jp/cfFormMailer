@@ -16,6 +16,8 @@ namespace CfFormMailer\Tests\Harness;
  * - mail_fail       真ならメールの送信に失敗させる
  * - request_time / mt_seed
  * - user_functions  _validate_* などを定義した PHP ファイル（任意）
+ * - extra_files     設置フォルダからの相対パス => 内容。このリクエストの間だけ置く
+ *                   （additionalMethods.inc.php などの置き場所を試すときに使う）
  *
  * 結果は run-step.php が返す配列（return / echo / exited / session / mails / logs など）。
  */
@@ -47,6 +49,7 @@ class StepRunner
             'request_time' => 1793232000,
             'mt_seed' => 12345,
             'user_functions' => null,
+            'extra_files' => [],
         ];
     }
 
@@ -58,6 +61,29 @@ class StepRunner
         }
         $input = array_replace($defaults, $input);
 
+        $placed = [];
+        foreach ($input['extra_files'] as $path => $content) {
+            $file = SiteFixture::snippetPath() . '/' . $path;
+            if (file_exists($file)) {
+                throw new \RuntimeException('extra_files が既にあるファイルを上書きしようとしました: ' . $path);
+            }
+            if (!is_dir(dirname($file))) {
+                mkdir(dirname($file), 0777, true);
+            }
+            file_put_contents($file, $content);
+            $placed[] = $file;
+        }
+        try {
+            return self::runProcess($input);
+        } finally {
+            foreach ($placed as $file) {
+                unlink($file);
+            }
+        }
+    }
+
+    private static function runProcess(array $input): array
+    {
         $inFile = tempnam(sys_get_temp_dir(), 'cfm-in-');
         $outFile = tempnam(sys_get_temp_dir(), 'cfm-out-');
         unlink($outFile);

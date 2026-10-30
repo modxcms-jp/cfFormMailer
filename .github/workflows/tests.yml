@@ -28,7 +28,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: ['7.4', '8.3', '8.5']
+        # 8.0 は、Deprecated が増えた 8.1 の手前の版として入れている
+        php: ['7.4', '8.0', '8.3', '8.5']
     steps:
       - uses: actions/checkout@v4
       - run: tests/run-in-docker.sh ${{ matrix.php }}

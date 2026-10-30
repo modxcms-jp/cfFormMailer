@@ -1,0 +1,9 @@
+== return ==
+false
+
+== php_errors ==
+Deprecated: trim(): Passing null to parameter #1 ($string) of type string is deprecated
+
+== session ==
+array (
+)
