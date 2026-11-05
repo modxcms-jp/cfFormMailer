@@ -1,0 +1,29 @@
+== return ==
+<h3>メール送信が完了しました。</h3>
+<p>お問い合わせいただき、ありがとうございました。</p>
+<p><a href="[(base_url)]">トップに戻る</a></p>
+
+== session ==
+array (
+  '_cffm_recently_send' => 
+  array (
+    'dept' => '営業',
+    'name' => '山田',
+  ),
+  'dynamic_send_to' => 
+  array (
+    'サポート' => 'support@example.com',
+    '営業' => 'sales@example.com',
+  ),
+)
+
+== mails ==
+--- mail #1
+to: sales@example.com
+from: sales@example.com
+sender: sales@example.com
+subject: 問い合わせ
+charset: utf-8 / encoding: base64
+body:
+お名前: 山田
+お問い合わせ先: 営業

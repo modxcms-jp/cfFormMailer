@@ -1,0 +1,12 @@
+<form action="[~[*id*]~]" method="post">
+  <label for="f_name">お名前</label>
+  <input type="text" name="name" id="f_name" valid="1" />
+  <label for="f_dept">お問い合わせ先</label>
+  <select name="dept" id="f_dept" valid="1">
+    <option value="">選択してください</option>
+    <option value="営業" sendto="sales@example.com">営業</option>
+    <option sendto="support@example.com" value="サポート">サポート</option>
+    <option value="その他">その他</option>
+  </select>
+  <input type="submit" value="確認" />
+</form>

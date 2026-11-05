@@ -1,0 +1,16 @@
+== return ==
+<p style="color:#cc0000;background:#fff;font-weight:bold;">SYSTEM ERROR::画面遷移が正常に行われませんでした</p>
+
+== session ==
+array (
+  '_cf_uploaded' => 
+  array (
+    'attach' => 
+    array (
+      'mime' => 'text/plain',
+      'path' => '<SITE>/assets/snippets/cfFormMailer/tmp/upload.txt',
+    ),
+  ),
+  'dynamic_send_to' => NULL,
+  'veriword' => 'abcd',
+)

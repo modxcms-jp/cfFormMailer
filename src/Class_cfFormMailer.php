@@ -264,6 +264,8 @@ class Class_cfFormMailer
         // ワンタイムトークンを生成
         $token = $this->getToken();
         $_SESSION['_cffm_token'] = $token;
+        // 検証を通った値（変換したあとのもの）を覚えておき、送信ではこれを使う
+        $_SESSION['_cffm_confirmed'] = $this->form;
         $text = str_ireplace(
             '</form>',
             sprintf(
@@ -367,6 +369,13 @@ class Class_cfFormMailer
         $_SESSION['dynamic_send_to'] = $this->dynamic_send_to_field($tmp_html);
 
         foreach ($this->parsedForm as $field => $method) {
+            // name に [] が付いていない項目に配列が送られたら、入力エラーにして検証を飛ばす
+            // （検証メソッドは文字列を前提にしているため）
+            if (empty($method['is_array']) && is_array($this->form[$field] ?? null)) {
+                $this->setFormError($field, $this->adaptEncoding($method['label']), '入力値の形式が正しくありません');
+                continue;
+            }
+
             // 初期変換
             if ($method['type'] !== 'textarea') {
                 // <textarea>タグ以外は改行を削除
@@ -510,6 +519,10 @@ class Class_cfFormMailer
             // テキストボックス
             if ($tag[1] === 'input' && $fieldType === 'text') {
                 $fieldValue = $params[$fieldName] ?? '';
+                // 配列で送られた値は、テキストボックスに戻さない
+                if (is_array($fieldValue)) {
+                    $fieldValue = '';
+                }
                 if (count($m_value) > 1) {
                     $pat = $m_value[0];
                     $rep = 'value="' . $this->encodeHTML($fieldValue) . '"';
@@ -569,7 +582,7 @@ class Class_cfFormMailer
                 }
                 // 複数行テキスト
             } elseif ($tag[1] === 'textarea') {
-                if ($fieldValue) {
+                if ($fieldValue && !is_array($fieldValue)) {
                     $pat = $tag[0];
                     $rep = sprintf(
                         '<%s%s%s>%s</textarea>',
@@ -685,7 +698,7 @@ class Class_cfFormMailer
         $pm->Sender = $pm->From;
         $pm->Body = $this->makeBody(
             $tmpl,
-            ($this->makePh($this->form, $admin_address))
+            ($this->makePh($this->form, $admin_address, $this->config('admin_ishtml')))
         );
         $this->applyMailCharset($pm);
 
@@ -773,7 +786,8 @@ class Class_cfFormMailer
         }
         $admin_address = $admin_addresses[0];
         $pm->setFrom(
-            $admin_address,
+            // 省略したときは、管理者のアドレス（複数あれば先頭）
+            $this->config('reply_from') ? $this->config('reply_from') : $admin_address,
             $this->config('reply_fromname')
         );
         // モバイル用のテンプレート切り替え
@@ -792,7 +806,7 @@ class Class_cfFormMailer
         $pm->Sender = $pm->From;
         $pm->Body = $this->makeBody(
             $tmpl_u,
-            ($this->makePh($this->form, $admin_address))
+            ($this->makePh($this->form, $admin_address, $this->config('reply_ishtml')))
         );
         $this->applyMailCharset($pm);
         // 添付ファイル処理
@@ -923,7 +937,15 @@ class Class_cfFormMailer
         $pm->Encoding = 'base64';
     }
 
-    private function makePh($form, $adminmail)
+    /**
+     * メール本文のプレースホルダの値を作る
+     *
+     * @param array  $form      フォームの値
+     * @param string $adminmail 管理者のメールアドレス
+     * @param mixed  $isHtml    HTML メールにするか（管理者宛は admin_ishtml、自動返信は reply_ishtml）
+     * @return array
+     */
+    private function makePh($form, $adminmail, $isHtml)
     {
         $remote_addr = serverv('REMOTE_ADDR', '');
         $user_agent = serverv('HTTP_USER_AGENT', '');
@@ -936,7 +958,7 @@ class Class_cfFormMailer
             'sender_ua'   => $this->encodeHTML($user_agent),
             'reply_to'    => $this->getAutoReplyAddress(),
         );
-        if (!$this->config('reply_ishtml')) {
+        if (!$isHtml) {
             return $form + $additional;
         }
         if (!$this->config('allow_html')) {
@@ -1613,8 +1635,13 @@ class Class_cfFormMailer
                     'required' => $required,
                     'method'   => $method,
                     'param'    => $param,
-                    'label'    => $label
+                    'label'    => $label,
+                    'is_array' => false
                 );
+            }
+            // name に [] が付いた項目は、値を配列で受ける（同じ name のどれか 1 つに付いていればよい）
+            if (strpos($v[3], '[]') !== false) {
+                $methods[$fieldName]['is_array'] = true;
             }
         }
         return $methods;
@@ -1664,6 +1691,7 @@ class Class_cfFormMailer
             return null;
         }
 
+        $dynamic_send_to = array();
         foreach ($m_options[0] as $m_option) {
             preg_match_all(
                 "/(value|sendto)=([\"'])(.+?)\\2/i",
@@ -1671,16 +1699,18 @@ class Class_cfFormMailer
                 $buf,
                 PREG_SET_ORDER
             );
-            if ($buf && count($buf) != 2) {
+            $attrs = array();
+            foreach ($buf as $attr) {
+                $attrs[strtolower($attr[1])] = $attr[3];
+            }
+            // value と sendto の両方がそろった選択肢だけを使う
+            // （<option value="">選択してください</option> などは飛ばす）
+            if (!isset($attrs['value'], $attrs['sendto'])) {
                 continue;
             }
-            if ($buf[0][1] === 'value') {
-                $dynamic_send_to[$buf[0][3]] = $buf[1][3];
-            } else {
-                $dynamic_send_to[$buf[1][3]] = $buf[0][3];
-            }
+            $dynamic_send_to[$attrs['value']] = $attrs['sendto'];
         }
-        return $dynamic_send_to;
+        return $dynamic_send_to ? $dynamic_send_to : null;
     }
 
     private function _get_input_type($v)
@@ -1713,7 +1743,28 @@ class Class_cfFormMailer
     }
 
     /**
-     * 入力値をセッションに待避
+     * 送信では、確認画面を出したときに検証を通った値を使う
+     *
+     * 確認画面の hidden の値は書き換えられるので、送られてきた値は使わない。
+     * 検証し直すと、変換のある検証（zip でハイフンを足すなど）と len() を組み合わせたときに、
+     * 変換したあとの値ではじかれてしまうため、検証済みの値をそのまま使う。
+     *
+     * @access public
+     * @return boolean 検証済みの値が無ければ false
+     */
+    public function useConfirmedForm()
+    {
+        $confirmed = $_SESSION['_cffm_confirmed'] ?? null;
+        unset($_SESSION['_cffm_confirmed']);
+        if (!is_array($confirmed) || !$confirmed) {
+            return false;
+        }
+        $this->form = $confirmed;
+        return true;
+    }
+
+    /**
+     * 送信したデータをセッションに格納
      *
      * @access public
      * @param  void
@@ -1862,8 +1913,10 @@ class Class_cfFormMailer
                 $reply_to[] = '@';
                 continue;
             }
-            if (empty($this->form[$t])) {
-                exit('reply_toの設定が正しくありません');
+            // 欄が空、または配列で送られたときは、自動返信先なしとする
+            // （validate() が形式の誤りとして扱う）
+            if (empty($this->form[$t]) || !is_string($this->form[$t])) {
+                return '';
             }
             $reply_to[] = $this->form[$t];
         }
@@ -1879,6 +1932,10 @@ class Class_cfFormMailer
      */
     private function _isValidEmail($addr)
     {
+        // 配列で送られた値などは、メールアドレスとして扱わない
+        if (!is_string($addr)) {
+            return false;
+        }
         return preg_match(
             "/^(?:[a-z0-9+_-]+?\.)*?[a-z0-9_+-]+?@(?:[a-z0-9_-]+?\.)*?[a-z0-9_-]+?\.[a-z0-9]{2,5}$/i",
             $addr
@@ -1956,7 +2013,8 @@ class Class_cfFormMailer
         if (strpos($lang, 'euc') !== false) {
             return 'euc-jp';
         }
-        return $lang;
+        // それ以外の言語（english など）は utf-8 とする
+        return 'utf-8';
     }
     /**
      * 環境設定の読み込み
