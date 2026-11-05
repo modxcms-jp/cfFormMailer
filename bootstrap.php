@@ -57,6 +57,10 @@ if (postv('_mode') === 'send') {
     if (!$mf->isValidToken(postv('_cffm_token'))) {
         return $mf->raiseError('画面遷移が正常に行われませんでした');
     }
+    // 確認画面の hidden の値は書き換えられるので、送信の前にもう一度検証する
+    if (!$mf->validate()) {
+        return $mf->renderFormWithError();
+    }
     $sent = $mf->sendMail();
     if (!$sent) {
         return $mf->raiseError($mf->getError());
