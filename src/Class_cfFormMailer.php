@@ -12,6 +12,10 @@
 
 class Class_cfFormMailer
 {
+    /**
+     * 文字列を前提にした標準の検証メソッド（配列の値には、要素ごとに当てる）
+     */
+    const STRING_METHODS = array('num', 'email', 'len', 'tel', 'zip', 'url', 'convert', 'zenhan', 'hanzen');
 
     public $cfg = array();
 
@@ -339,6 +343,36 @@ class Class_cfFormMailer
     }
 
     /**
+     * 配列の値の要素ごとに、標準の検証メソッドを当てる
+     *
+     * 検証メソッドは $this->form[$field] を読み書きするので、要素を 1 つずつ置いて呼び、
+     * 変換された値を集めて配列に戻す。
+     *
+     * @param  string $funcName    検証メソッドの名前（_def_xxx）
+     * @param  string $methodParam 検証メソッドの引数
+     * @param  string $field       項目名
+     * @return true|string 結果（最初に見つかったエラーの文言）
+     */
+    private function validateEachElement($funcName, $methodParam, $field)
+    {
+        $values = $this->form[$field];
+        $result = true;
+        foreach ($values as $k => $v) {
+            if ($v === '') {
+                continue;
+            }
+            $this->form[$field] = $v;
+            $elementResult = $this->$funcName($v, $methodParam, $field);
+            $values[$k] = $this->form[$field];
+            if ($result === true && $elementResult !== true) {
+                $result = $elementResult;
+            }
+        }
+        $this->form[$field] = $values;
+        return $result;
+    }
+
+    /**
      * 入力値を検証
      *
      * @access public
@@ -428,7 +462,12 @@ class Class_cfFormMailer
                     // 標準メソッドを処理
                     $funcName = '_def_' . $method_func;
                     if (is_callable(array($this, $funcName))) {
-                        $result = $this->$funcName($field_value, $method_param, $field);
+                        if (is_array($this->form[$field] ?? null) && in_array($method_func, self::STRING_METHODS, true)) {
+                            // 文字列を前提にした検証は、配列の要素ごとに当てる
+                            $result = $this->validateEachElement($funcName, $method_param, $field);
+                        } else {
+                            $result = $this->$funcName($field_value, $method_param, $field);
+                        }
                         if ($result !== true) {
                             $this->setFormError($field, $this->adaptEncoding($method['label']), $result);
                         }
@@ -1516,10 +1555,15 @@ class Class_cfFormMailer
      * 投稿されたデータの初期処理
      *
      * @access private
+     * name="xxx[]" の 1 段の配列までを受ける。それより深い配列（xxx[a][]=… など）は、
+     * フォームの項目として扱えないので捨てる（文字列の関数に配列が渡って落ちるのを防ぐ）。
+     *
+     * @access private
      * @param  array $array データ
+     * @param  int   $depth 配列の深さ（呼び出し元は 0）
      * @return array 初期処理の終わったデータ
      */
-    private function getFormVariables($array)
+    private function getFormVariables($array, $depth = 0)
     {
 
         if (!is_array($array)) {
@@ -1532,7 +1576,9 @@ class Class_cfFormMailer
                 continue;
             }
             if (is_array($v)) {
-                $ret[$k] = $this->getFormVariables($v);
+                if ($depth < 1) {
+                    $ret[$k] = $this->getFormVariables($v, $depth + 1);
+                }
                 continue;
             }
             $ret[$k] = preg_replace(

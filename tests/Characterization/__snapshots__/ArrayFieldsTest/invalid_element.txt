@@ -1,0 +1,18 @@
+== return ==
+<ul><li>[電話番号] 正しい電話番号を入力してください。</li><li>[数量] 3文字以内で入力してください</li></ul>
+<form action="[~[*id*]~]" method="post"><input type="hidden" name="_mode" value="conf" />
+  <label for="f_tel">電話番号</label>
+  <input type="text" name="tel[]" id="f_tel" value="" />
+  <input type="text" name="tel[]" value="" />
+  <label for="f_n">数量</label>
+  <input type="text" name="n[]" id="f_n" value="" />
+  <input type="text" name="n[]" value="" />
+  <input type="checkbox" name="items[]" value="A" checked="checked" />A
+  <input type="checkbox" name="items[]" value="B" />B
+  <input type="submit" value="確認" />
+</form>
+
+== session ==
+array (
+  'dynamic_send_to' => NULL,
+)
