@@ -7,6 +7,10 @@
 
 == session ==
 array (
+  '_cffm_confirmed' => 
+  array (
+    'name' => '山田',
+  ),
   '_cffm_token' => '<TOKEN>',
   'dynamic_send_to' => NULL,
 )

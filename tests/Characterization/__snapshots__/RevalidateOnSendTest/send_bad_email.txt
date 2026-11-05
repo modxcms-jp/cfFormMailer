@@ -1,27 +1,43 @@
 == return ==
-<ul><li>[メールアドレス] メールアドレスの形式が正しくありません</li><li>[メールアドレス] 形式が正しくありません</li></ul>
-<form action="[~[*id*]~]" method="post" enctype="multipart/form-data"><input type="hidden" name="_mode" value="conf" />
-  <label for="f_name">お名前</label>
-  <input type="text" name="name" id="f_name" value="山田" />
-  <label for="f_email">メールアドレス</label>
-  <input type="text" name="email" id="f_email" class="invalid" value="not-an-address" />
-  <label for="f_attach">添付ファイル</label>
-  <input type="file" name="attach" id="f_attach" />
-  <img src="/manager/includes/veriword.php?tmp=<RND>" alt="" />
-  <input type="text" name="veri" value="abcd" />
-  <input type="submit" value="確認" />
-</form>
+<h3>メール送信が完了しました。</h3>
+<p>お問い合わせいただき、ありがとうございました。</p>
+<p><a href="[(base_url)]">トップに戻る</a></p>
 
 == session ==
 array (
-  '_cf_uploaded' => 
+  '_cffm_recently_send' => 
   array (
-    'attach' => 
-    array (
-      'mime' => 'text/plain',
-      'path' => '<SITE>/assets/snippets/cfFormMailer/tmp/upload.txt',
-    ),
+    'email' => 'taro@example.com',
+    'name' => '山田',
+    'veri' => 'abcd',
+    'zip' => '123-4567',
   ),
   'dynamic_send_to' => NULL,
   'veriword' => 'abcd',
 )
+
+== mails ==
+--- mail #1
+to: admin@example.com
+reply_to: taro@example.com
+from: admin@example.com
+sender: admin@example.com
+subject: 問い合わせ
+charset: utf-8 / encoding: base64
+attachment: <SITE>/assets/snippets/cfFormMailer/tmp/upload.txt (upload.txt)
+body:
+お名前: 山田
+メール: taro@example.com
+郵便番号: 123-4567
+
+--- mail #2
+to: taro@example.com
+from: テストサイト <admin@example.com>
+sender: admin@example.com
+subject: ありがとうございます
+charset: utf-8 / encoding: base64
+attachment: <SITE>/assets/snippets/cfFormMailer/tmp/upload.txt (upload.txt)
+body:
+お名前: 山田
+メール: taro@example.com
+郵便番号: 123-4567

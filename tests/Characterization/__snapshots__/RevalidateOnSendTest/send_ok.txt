@@ -10,6 +10,7 @@ array (
     'email' => 'taro@example.com',
     'name' => '山田',
     'veri' => 'abcd',
+    'zip' => '123-4567',
   ),
   'dynamic_send_to' => NULL,
   'veriword' => 'abcd',
@@ -27,6 +28,7 @@ attachment: <SITE>/assets/snippets/cfFormMailer/tmp/upload.txt (upload.txt)
 body:
 お名前: 山田
 メール: taro@example.com
+郵便番号: 123-4567
 
 --- mail #2
 to: taro@example.com
@@ -38,3 +40,4 @@ attachment: <SITE>/assets/snippets/cfFormMailer/tmp/upload.txt (upload.txt)
 body:
 お名前: 山田
 メール: taro@example.com
+郵便番号: 123-4567

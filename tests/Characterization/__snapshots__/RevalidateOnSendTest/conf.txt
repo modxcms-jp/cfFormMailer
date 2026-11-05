@@ -1,9 +1,10 @@
 == return ==
-<p>山田 / taro@example.com / upload.txt</p>
+<p>山田 / taro@example.com / 123-4567 / upload.txt</p>
 <form action="[~[*id*]~]" method="post"><input type="hidden" name="_mode" value="send" />
   <input type="submit" value="送信する" />
 <input type="hidden" name="name" value="山田" />
 <input type="hidden" name="email" value="taro@example.com" />
+<input type="hidden" name="zip" value="123-4567" />
 <input type="hidden" name="veri" value="abcd" /><input type="hidden" name="_cffm_token" value="<TOKEN>" /></form>
 
 == session ==
@@ -15,6 +16,13 @@ array (
       'mime' => 'text/plain',
       'path' => '<SITE>/assets/snippets/cfFormMailer/tmp/upload.txt',
     ),
+  ),
+  '_cffm_confirmed' => 
+  array (
+    'email' => 'taro@example.com',
+    'name' => '山田',
+    'veri' => 'abcd',
+    'zip' => '123-4567',
   ),
   '_cffm_token' => '<TOKEN>',
   'dynamic_send_to' => NULL,
