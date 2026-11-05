@@ -15,6 +15,14 @@ array (
       'path' => '<SITE>/assets/snippets/cfFormMailer/tmp/upload.txt',
     ),
   ),
+  '_cffm_confirmed' => 
+  array (
+    'items' => 
+    array (
+      0 => 'A',
+    ),
+    'name' => '山田',
+  ),
   '_cffm_token' => '<TOKEN>',
   'dynamic_send_to' => NULL,
 )
