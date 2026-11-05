@@ -269,6 +269,8 @@ class Class_cfFormMailer
         // ワンタイムトークンを生成
         $token = $this->getToken();
         $_SESSION['_cffm_token'] = $token;
+        // 検証を通った値（変換したあとのもの）を覚えておき、送信ではこれを使う
+        $_SESSION['_cffm_confirmed'] = $this->form;
         $text = str_ireplace(
             '</form>',
             sprintf(
@@ -1718,7 +1720,28 @@ class Class_cfFormMailer
     }
 
     /**
-     * 入力値をセッションに待避
+     * 送信では、確認画面を出したときに検証を通った値を使う
+     *
+     * 確認画面の hidden の値は書き換えられるので、送られてきた値は使わない。
+     * 検証し直すと、変換のある検証（zip でハイフンを足すなど）と len() を組み合わせたときに、
+     * 変換したあとの値ではじかれてしまうため、検証済みの値をそのまま使う。
+     *
+     * @access public
+     * @return boolean 検証済みの値が無ければ false
+     */
+    public function useConfirmedForm()
+    {
+        $confirmed = $_SESSION['_cffm_confirmed'] ?? null;
+        unset($_SESSION['_cffm_confirmed']);
+        if (!is_array($confirmed) || !$confirmed) {
+            return false;
+        }
+        $this->form = $confirmed;
+        return true;
+    }
+
+    /**
+     * 送信したデータをセッションに格納
      *
      * @access public
      * @param  void
