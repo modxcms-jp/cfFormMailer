@@ -1,0 +1,12 @@
+<ul>[+errors|implodetag(li)+]</ul>
+<form action="[~[*id*]~]" method="post">
+  <label for="f_email">メールアドレス</label>
+  <input type="text" name="email" id="f_email" valid="1:email" />
+  <label for="f_tel">電話番号</label>
+  <input type="text" name="tel" id="f_tel" valid="1:tel" />
+  <label for="f_zip">郵便番号</label>
+  <input type="text" name="zip" id="f_zip" valid="0:num,len(-8)" />
+  <input type="checkbox" name="items[]" value="A" valid="1::品目" />A
+  <input type="checkbox" name="items[]" value="B" />B
+  <input type="submit" value="確認" />
+</form>
