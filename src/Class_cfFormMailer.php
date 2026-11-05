@@ -761,7 +761,8 @@ class Class_cfFormMailer
         $admin_addresses = $this->makeAdminAddress();
         $admin_address = $admin_addresses[0];
         $pm->setFrom(
-            $admin_address,
+            // 省略したときは、管理者のアドレス（複数あれば先頭）
+            $this->config('reply_from') ? $this->config('reply_from') : $admin_address,
             $this->config('reply_fromname')
         );
         // モバイル用のテンプレート切り替え

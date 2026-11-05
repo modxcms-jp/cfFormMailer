@@ -28,8 +28,8 @@ body:
 
 --- mail #2
 to: taro@example.com
-from: テストサイト <admin@example.com>
-sender: admin@example.com
+from: テストサイト <noreply@example.com>
+sender: noreply@example.com
 subject: ありがとうございます
 charset: utf-8 / encoding: base64
 body:
