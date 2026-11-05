@@ -539,6 +539,7 @@ docomo.ne.jp / ezweb.ne.jp / softbank.ne.jp / vodafone.ne.jp / disney.ne.jp / pd
 <p>画像なら&lt;img&gt;タグのsrc属性、それ以外なら&lt;a&gt;タグのhref属性に指定して別画面で表示させるという方法が良いと思います。<br /> 
   「テンプレートでの記述例」を参考にしてください。
 </p>
+<p>ブラウザでそのまま表示されるのは、画像（JPEG・PNG・GIF・WebP・BMP）と PDF だけです。それ以外のファイル（テキスト・Word・SVG・HTML など）は、ダウンロードになります。アップロードされた HTML などを、サイトのページとして表示させないためです。あわせて、ブラウザがファイルの種類を推測しないように <code>X-Content-Type-Options: nosniff</code> を付けます。ファイルの種類は、ファイルの中身から判定したものを使います。</p>
 <h4>[追加されるプレースホルダ]</h4>
 <p>以下のプレースホルダが追加され、「確認画面テンプレート」で使用できます。</p>
 <h5>アップロードされたファイルが画像の場合</h5>
@@ -583,7 +584,8 @@ docomo.ne.jp / ezweb.ne.jp / softbank.ne.jp / vodafone.ne.jp / disney.ne.jp / pd
   <dt>画像以外のファイルの場合</dt>
   <dd>入力画面：　<code>&lt;p&gt;&lt;input type=&quot;file&quot; name=&quot;profile&quot; valid=&quot;1:allowtype(pdf|txt)&quot; /&gt; PDFまたはテキスト形式のプロフィールをアップロードしてください&lt;/p&gt;</code><br />
   確認画面：　<code>&lt;p&gt;&lt;a href=&quot;<strong>[+profile.url+]</strong>&quot; target=&quot;_blank&quot;&gt;<strong>[+profile.filename+]</strong>&lt;/a&gt; 【<strong>[+profile.filetype+]</strong>形式】&lt;/p&gt;</code><br />
-  表示例：　　<code>&lt;p&gt;&lt;a href=&quot;/contact.html?cfm_file=profile&quot; target=&quot;_blank&quot;&gt;○○のプロフィール.pdf&lt;/a&gt; 【PDF形式】&lt;/p&gt; </code></dd>
+  表示例：　　<code>&lt;p&gt;&lt;a href=&quot;/contact.html?cfm_file=profile&quot; target=&quot;_blank&quot;&gt;○○のプロフィール.pdf&lt;/a&gt; 【PDF形式】&lt;/p&gt; </code><br />
+  ※PDF は別画面で表示されます。テキスト形式のファイルは、表示されずにダウンロードになります。</dd>
 </dl>
 <h4>[その他仕様]</h4>
 <p>※アップロードされたファイルは、アップロード時のファイル名（クライアントマシンの元のファイル名）で添付されます。<br />

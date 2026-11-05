@@ -202,6 +202,13 @@ forms/myform/
 スニペットが、本人のセッションにあるファイルだけを返します（フォームのページの URL に `?cfm_file=項目名` を付けたもの）。
 プラグインのインストールは要りません。
 
+ブラウザでそのまま表示されるのは、画像（JPEG・PNG・GIF・WebP・BMP）と PDF だけです。
+それ以外のファイル（テキスト・Word・SVG・HTML など）は、`Content-Disposition: attachment` を付けてダウンロードとして返します。
+アップロードされた HTML などを、サイトのオリジンで表示させないためです。
+あわせて、`X-Content-Type-Options: nosniff` を付けて、ブラウザがファイルの種類を推測しないようにします。
+Content-Type には、ファイルの中身から判定した種類（Fileinfo）を使います。
+ファイルが無いとき（送信が済んだ、別の人のセッションなど）は 404 を返します。
+
 #### 以前の書き方（cfFileView?field=）を使っているサイト
 
 テンプレートに `cfFileView?field=項目名` と書いているサイトは、これまでどおりプラグイン cfFileView で表示されます。

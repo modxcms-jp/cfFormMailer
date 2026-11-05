@@ -590,6 +590,8 @@ attach_fileは半角英数字に限定されるため、日本語名で送信し
 画像なら<img>タグのsrc属性、それ以外なら<a>タグのhref属性に指定して別画面で表示させるという方法が良いと思います。
 「テンプレートでの記述例」を参考にしてください。
 
+ブラウザでそのまま表示されるのは、画像（JPEG・PNG・GIF・WebP・BMP）と PDF だけです。それ以外のファイル（テキスト・Word・SVG・HTML など）は、ダウンロードになります。アップロードされた HTML などを、サイトのページとして表示させないためです。あわせて、ブラウザがファイルの種類を推測しないように `X-Content-Type-Options: nosniff` を付けます。ファイルの種類は、ファイルの中身から判定したものを使います。
+
 #### [追加されるプレースホルダ]
 
 以下のプレースホルダが追加され、「確認画面テンプレート」で使用できます。
@@ -639,6 +641,7 @@ GIF / JPG / PNG / PDF / TXT / HTML / WORD
 入力画面：　`<p><input type="file" name="profile" valid="1:allowtype(pdf|txt)" /> PDFまたはテキスト形式のプロフィールをアップロードしてください</p>`
 確認画面：　`<p><a href="[+profile.url+]" target="_blank">[+profile.filename+]</a> 【[+profile.filetype+]形式】</p>`
 表示例：　　`<p><a href="/contact.html?cfm_file=profile" target="_blank">○○のプロフィール.pdf</a> 【PDF形式】</p>`
+※PDF は別画面で表示されます。テキスト形式のファイルは、表示されずにダウンロードになります。
 
 #### [その他仕様]
 
