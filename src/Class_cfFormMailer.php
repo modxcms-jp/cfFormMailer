@@ -363,6 +363,13 @@ class Class_cfFormMailer
         $_SESSION['dynamic_send_to'] = $this->dynamic_send_to_field($tmp_html);
 
         foreach ($this->parsedForm as $field => $method) {
+            // name に [] が付いていない項目に配列が送られたら、入力エラーにして検証を飛ばす
+            // （検証メソッドは文字列を前提にしているため）
+            if (empty($method['is_array']) && is_array($this->form[$field] ?? null)) {
+                $this->setFormError($field, $this->adaptEncoding($method['label']), '入力値の形式が正しくありません');
+                continue;
+            }
+
             // 初期変換
             if ($method['type'] !== 'textarea') {
                 // <textarea>タグ以外は改行を削除
@@ -506,6 +513,10 @@ class Class_cfFormMailer
             // テキストボックス
             if ($tag[1] === 'input' && $fieldType === 'text') {
                 $fieldValue = $params[$fieldName] ?? '';
+                // 配列で送られた値は、テキストボックスに戻さない
+                if (is_array($fieldValue)) {
+                    $fieldValue = '';
+                }
                 if (count($m_value) > 1) {
                     $pat = $m_value[0];
                     $rep = 'value="' . $this->encodeHTML($fieldValue) . '"';
@@ -565,7 +576,7 @@ class Class_cfFormMailer
                 }
                 // 複数行テキスト
             } elseif ($tag[1] === 'textarea') {
-                if ($fieldValue) {
+                if ($fieldValue && !is_array($fieldValue)) {
                     $pat = $tag[0];
                     $rep = sprintf(
                         '<%s%s%s>%s</textarea>',
@@ -1598,8 +1609,13 @@ class Class_cfFormMailer
                     'required' => $required,
                     'method'   => $method,
                     'param'    => $param,
-                    'label'    => $label
+                    'label'    => $label,
+                    'is_array' => false
                 );
+            }
+            // name に [] が付いた項目は、値を配列で受ける（同じ name のどれか 1 つに付いていればよい）
+            if (strpos($v[3], '[]') !== false) {
+                $methods[$fieldName]['is_array'] = true;
             }
         }
         return $methods;
@@ -1649,6 +1665,7 @@ class Class_cfFormMailer
             return null;
         }
 
+        $dynamic_send_to = array();
         foreach ($m_options[0] as $m_option) {
             preg_match_all(
                 "/(value|sendto)=([\"'])(.+?)\\2/i",
@@ -1656,16 +1673,18 @@ class Class_cfFormMailer
                 $buf,
                 PREG_SET_ORDER
             );
-            if ($buf && count($buf) != 2) {
+            $attrs = array();
+            foreach ($buf as $attr) {
+                $attrs[strtolower($attr[1])] = $attr[3];
+            }
+            // value と sendto の両方がそろった選択肢だけを使う
+            // （<option value="">選択してください</option> などは飛ばす）
+            if (!isset($attrs['value'], $attrs['sendto'])) {
                 continue;
             }
-            if ($buf[0][1] === 'value') {
-                $dynamic_send_to[$buf[0][3]] = $buf[1][3];
-            } else {
-                $dynamic_send_to[$buf[1][3]] = $buf[0][3];
-            }
+            $dynamic_send_to[$attrs['value']] = $attrs['sendto'];
         }
-        return $dynamic_send_to;
+        return $dynamic_send_to ? $dynamic_send_to : null;
     }
 
     private function _get_input_type($v)
@@ -1864,6 +1883,10 @@ class Class_cfFormMailer
      */
     private function _isValidEmail($addr)
     {
+        // 配列で送られた値などは、メールアドレスとして扱わない
+        if (!is_string($addr)) {
+            return false;
+        }
         return preg_match(
             "/^(?:[a-z0-9+_-]+?\.)*?[a-z0-9_+-]+?@(?:[a-z0-9_-]+?\.)*?[a-z0-9_-]+?\.[a-z0-9]{2,5}$/i",
             $addr

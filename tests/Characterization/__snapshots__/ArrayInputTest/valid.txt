@@ -1,0 +1,15 @@
+== return ==
+<p>taro@example.com / 03-1234-5678 / 1234567 / A<br />B</p>
+<form action="[~[*id*]~]" method="post"><input type="hidden" name="_mode" value="send" />
+  <input type="submit" value="送信する" />
+<input type="hidden" name="email" value="taro@example.com" />
+<input type="hidden" name="tel" value="03-1234-5678" />
+<input type="hidden" name="zip" value="1234567" />
+<input type="hidden" name="items[]" value="A" />
+<input type="hidden" name="items[]" value="B" /><input type="hidden" name="_cffm_token" value="<TOKEN>" /></form>
+
+== session ==
+array (
+  '_cffm_token' => '<TOKEN>',
+  'dynamic_send_to' => NULL,
+)

@@ -1,0 +1,17 @@
+== return ==
+<p>山田 / 営業</p>
+<form action="[~[*id*]~]" method="post"><input type="hidden" name="_mode" value="send" />
+  <input type="submit" value="送信する" />
+  <input type="submit" name="return" value="戻る" />
+<input type="hidden" name="name" value="山田" />
+<input type="hidden" name="dept" value="営業" /><input type="hidden" name="_cffm_token" value="<TOKEN>" /></form>
+
+== session ==
+array (
+  '_cffm_token' => '<TOKEN>',
+  'dynamic_send_to' => 
+  array (
+    'サポート' => 'support@example.com',
+    '営業' => 'sales@example.com',
+  ),
+)
