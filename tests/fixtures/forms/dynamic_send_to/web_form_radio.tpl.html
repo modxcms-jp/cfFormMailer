@@ -1,0 +1,9 @@
+<form action="[~[*id*]~]" method="post">
+  <label for="f_name">お名前</label>
+  <input type="text" name="name" id="f_name" valid="1" />
+  <input type="radio" name="dept" value="" />指定しない
+  <input type="radio" name="dept" value="営業" sendto="sales@example.com" valid="1::お問い合わせ先" />営業
+  <input type="radio" name="dept" sendto="support@example.com" value="サポート" />サポート
+  <input type="radio" name="dept" value="その他" />その他
+  <input type="submit" value="確認" />
+</form>
