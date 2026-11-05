@@ -690,7 +690,7 @@ class Class_cfFormMailer
         $pm->Sender = $pm->From;
         $pm->Body = $this->makeBody(
             $tmpl,
-            ($this->makePh($this->form, $admin_address))
+            ($this->makePh($this->form, $admin_address, $this->config('admin_ishtml')))
         );
         $this->applyMailCharset($pm);
 
@@ -774,7 +774,8 @@ class Class_cfFormMailer
         $admin_addresses = $this->makeAdminAddress();
         $admin_address = $admin_addresses[0];
         $pm->setFrom(
-            $admin_address,
+            // 省略したときは、管理者のアドレス（複数あれば先頭）
+            $this->config('reply_from') ? $this->config('reply_from') : $admin_address,
             $this->config('reply_fromname')
         );
         // モバイル用のテンプレート切り替え
@@ -793,7 +794,7 @@ class Class_cfFormMailer
         $pm->Sender = $pm->From;
         $pm->Body = $this->makeBody(
             $tmpl_u,
-            ($this->makePh($this->form, $admin_address))
+            ($this->makePh($this->form, $admin_address, $this->config('reply_ishtml')))
         );
         $this->applyMailCharset($pm);
         // 添付ファイル処理
@@ -922,7 +923,15 @@ class Class_cfFormMailer
         $pm->Encoding = 'base64';
     }
 
-    private function makePh($form, $adminmail)
+    /**
+     * メール本文のプレースホルダの値を作る
+     *
+     * @param array  $form      フォームの値
+     * @param string $adminmail 管理者のメールアドレス
+     * @param mixed  $isHtml    HTML メールにするか（管理者宛は admin_ishtml、自動返信は reply_ishtml）
+     * @return array
+     */
+    private function makePh($form, $adminmail, $isHtml)
     {
         $remote_addr = serverv('REMOTE_ADDR', '');
         $user_agent = serverv('HTTP_USER_AGENT', '');
@@ -935,7 +944,7 @@ class Class_cfFormMailer
             'sender_ua'   => $this->encodeHTML($user_agent),
             'reply_to'    => $this->getAutoReplyAddress(),
         );
-        if (!$this->config('reply_ishtml')) {
+        if (!$isHtml) {
             return $form + $additional;
         }
         if (!$this->config('allow_html')) {
@@ -1889,8 +1898,10 @@ class Class_cfFormMailer
                 $reply_to[] = '@';
                 continue;
             }
-            if (empty($this->form[$t])) {
-                exit('reply_toの設定が正しくありません');
+            // 欄が空、または配列で送られたときは、自動返信先なしとする
+            // （validate() が形式の誤りとして扱う）
+            if (empty($this->form[$t]) || !is_string($this->form[$t])) {
+                return '';
             }
             $reply_to[] = $this->form[$t];
         }
@@ -1987,7 +1998,8 @@ class Class_cfFormMailer
         if (strpos($lang, 'euc') !== false) {
             return 'euc-jp';
         }
-        return $lang;
+        // それ以外の言語（english など）は utf-8 とする
+        return 'utf-8';
     }
     /**
      * 環境設定の読み込み
