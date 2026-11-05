@@ -130,7 +130,14 @@ class FakeDocumentParser
 
     public function makeUrl($id = '', $alias = '', $args = '', $scheme = 'full', $ignoreReference = false)
     {
-        return 'url:' . $id;
+        // 本物と同じく、引数はページの URL に合わせて ? または & で続ける
+        // （フレンドリー URL が無効なら index.php?id=1&…、有効なら /page.html?…）
+        $url = 'url:' . $id;
+        $args = ltrim((string) $args, '?&');
+        if ($args === '') {
+            return $url;
+        }
+        return $url . (strpos($url, '?') === false ? '?' : '&') . $args;
     }
 
     public function logEvent($evtid, $type, $msg, $source = 'Parser')

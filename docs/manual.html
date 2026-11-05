@@ -49,7 +49,7 @@ strong { font-size: large;}
     </ul>
   </li>
   <li>（ファイルアップロードを使用する場合） 追加のライブラリは要りません。アップロードされたファイルの MIME タイプは、PHP の Fileinfo（標準で同梱）でファイルの中身から判定します。以前は class.upload.php の追加を推奨していましたが、今は不要です（置いてあっても使いません）。</li>
-  <li>（ファイルアップロードを使用する場合） プラグインcfFileViewをインストールします。<br />
+  <li>（ファイルアップロードを使用する場合） 確認画面でファイルを表示するのに、プラグインは要りません（[+フィールド名.url+] を使います）。以前の書き方 cfFileView?field= を使う場合だけ、プラグインcfFileViewをインストールします。<br />
   「<a href="#upload">ユーザーがアップロードしたファイルの添付送信</a>」を参照してください。  </li>
   <li>（送信内容を記録する場合） cfFormDBモジュールをインストールします。<br />
   詳細はcfFormDBのマニュアルを参照してください。</li>
@@ -521,11 +521,9 @@ docomo.ne.jp / ezweb.ne.jp / softbank.ne.jp / vodafone.ne.jp / disney.ne.jp / pd
 検証メソッドallowtypeとallowsizeで、アップロードできるファイルを限定することをお勧めします。<br />
 [注意]
 &quot;SAFE MODE Restriction in effect&quot;というエラーが発生する場合は、環境設定チャンクのupload_tmp_pathを1にしてみてください。</p>
-<h4>[プラグインの追加]</h4>
-<p style="color:#f00;">！送信内容確認画面でアップロードされたファイルを表示するには、プラグインの追加が必要です！</p>
-<p>アップロードされたファイルは、送信完了するまでブラウザからはアクセスできない一時ディレクトリに保管されるため、送信内容確認画面で表示するために追加処理が必要となります。<br />
-以下の手順に従って、プラグインcfFileViewをインストールしてください。<br /> 
-※確認画面でアップロードされたファイルを表示させない場合は、インストールする必要はありません。</p>
+<h4>[以前の書き方（cfFileView?field=）を使う場合のプラグイン]</h4>
+<p>確認画面でファイルを表示するには、プレースホルダ <strong>[+フィールド名.url+]</strong> を使います（「確認画面でのファイル指定」を参照）。プラグインは要りません。</p>
+<p>テンプレートに <strong>cfFileView?field=フィールド名</strong> と書いている場合だけ、プラグイン cfFileView が必要です。インストール済みのプラグインは、そのまま動きます。</p>
 <ol>
   <li>以下の情報で新規プラグインを作成します。<em><br />
   </em>■プラグイン名： <strong>cfFileView</strong><br />
@@ -536,11 +534,12 @@ docomo.ne.jp / ezweb.ne.jp / softbank.ne.jp / vodafone.ne.jp / disney.ne.jp / pd
 <h4>[ファイルの追加]</h4>
 <p>アップロードされたファイルの MIME タイプは、PHP の Fileinfo（標準で同梱）でファイルの中身から判定します。以前は class.upload.php の追加を推奨していましたが、今は不要です（置いてあっても使いません）。</p>
 <h4>[確認画面でのファイル指定]</h4>
-<p>アップロードされたファイルは、プラグインcfFileViewを利用して表示させますので、&lt;img&gt;タグや&lt;a&gt;タグのURLとして、以下のように記述します。</p>
-<p><strong>cfFileView?field=フィールド名</strong></p>
+<p>アップロードされたファイルは、送信が終わるまでブラウザからは直接開けない一時ディレクトリに保管されます。確認画面で表示するときは、&lt;img&gt;タグや&lt;a&gt;タグのURLとして、以下のように記述します。スニペットが、本人がアップロードしたファイルだけを返します。</p>
+<p><strong>[+フィールド名.url+]</strong></p>
 <p>画像なら&lt;img&gt;タグのsrc属性、それ以外なら&lt;a&gt;タグのhref属性に指定して別画面で表示させるという方法が良いと思います。<br /> 
   「テンプレートでの記述例」を参考にしてください。
 </p>
+<p>ブラウザでそのまま表示されるのは、画像（JPEG・PNG・GIF・WebP・BMP）と PDF だけです。それ以外のファイル（テキスト・Word・SVG・HTML など）は、ダウンロードになります。アップロードされた HTML などを、サイトのページとして表示させないためです。あわせて、ブラウザがファイルの種類を推測しないように <code>X-Content-Type-Options: nosniff</code> を付けます。ファイルの種類は、ファイルの中身から判定したものを使います。</p>
 <h4>[追加されるプレースホルダ]</h4>
 <p>以下のプレースホルダが追加され、「確認画面テンプレート」で使用できます。</p>
 <h5>アップロードされたファイルが画像の場合</h5>
@@ -567,20 +566,26 @@ docomo.ne.jp / ezweb.ne.jp / softbank.ne.jp / vodafone.ne.jp / disney.ne.jp / pd
   </dd>
   <dd></dd>
 </dl>
+<h5>画像・画像以外のどちらでも</h5>
+<dl>
+  <dt>[+フィールド名.url+]</dt>
+  <dd>確認画面でファイルを開く URL（フォームのページの URL に ?cfm_file=フィールド名 を付けたもの）</dd>
+</dl>
 <h4>[テンプレートでの記述例]</h4>
 <dl>
   <dt>画像の場合(1)</dt>
   <dd>入力画面：　<code>&lt;p&gt;写真&lt;input type=&quot;file&quot; name=&quot;pic&quot; valid=&quot;:allowsize(1024)&quot; /&gt;&lt;/p&gt;</code><br />
-  確認画面：　<code>&lt;p&gt;写真： &lt;img src=&quot;<strong>cfFileView?field=pic</strong>&quot; width=&quot;<strong>[+pic.imagewidth+]</strong>&quot; height=&quot;<strong>[+pic.imageheight+]</strong>&quot; alt=&quot;<strong>[+pic.imagename+]</strong>&quot; /&gt;&lt;/p&gt;</code><br />
-  表示例：　　<code>&lt;p&gt;写真： &lt;img src=&quot;cfFileView?field=pic&quot; width=&quot;240&quot; height=&quot;320&quot; alt=&quot;画像です.jpg&quot; /&gt;&lt;/p&gt;</code></dd>
+  確認画面：　<code>&lt;p&gt;写真： &lt;img src=&quot;<strong>[+pic.url+]</strong>&quot; width=&quot;<strong>[+pic.imagewidth+]</strong>&quot; height=&quot;<strong>[+pic.imageheight+]</strong>&quot; alt=&quot;<strong>[+pic.imagename+]</strong>&quot; /&gt;&lt;/p&gt;</code><br />
+  表示例：　　<code>&lt;p&gt;写真： &lt;img src=&quot;/contact.html?cfm_file=pic&quot; width=&quot;240&quot; height=&quot;320&quot; alt=&quot;画像です.jpg&quot; /&gt;&lt;/p&gt;</code></dd>
   <dt>画像の場合(2)</dt>
   <dd>入力画面：　<code>&lt;p&gt;写真&lt;input type=&quot;file&quot; name=&quot;photo&quot; valid=&quot;:allowtype(gif|jpg)&quot; /&gt;&lt;/p&gt;</code><br />
-  確認画面：　<code>&lt;p&gt;写真： &lt;img src=&quot;<strong>cfFileView?field=photo</strong>&quot; alt=&quot;&quot; width=&quot;100&quot; /&gt;&lt;/p&gt;</code><br />
-  表示例：　　<code>&lt;p&gt;写真： &lt;img src=&quot;cfFileView?field=photo&quot; alt=&quot;&quot; width=&quot;100&quot; /&gt;&lt;/p&gt;</code></dd>
+  確認画面：　<code>&lt;p&gt;写真： &lt;img src=&quot;<strong>[+photo.url+]</strong>&quot; alt=&quot;&quot; width=&quot;100&quot; /&gt;&lt;/p&gt;</code><br />
+  表示例：　　<code>&lt;p&gt;写真： &lt;img src=&quot;/contact.html?cfm_file=photo&quot; alt=&quot;&quot; width=&quot;100&quot; /&gt;&lt;/p&gt;</code></dd>
   <dt>画像以外のファイルの場合</dt>
   <dd>入力画面：　<code>&lt;p&gt;&lt;input type=&quot;file&quot; name=&quot;profile&quot; valid=&quot;1:allowtype(pdf|txt)&quot; /&gt; PDFまたはテキスト形式のプロフィールをアップロードしてください&lt;/p&gt;</code><br />
-  確認画面：　<code>&lt;p&gt;&lt;a href=&quot;<strong>cfFileView?field=profile</strong>&quot; target=&quot;_blank&quot;&gt;<strong>[+profile.filename+]</strong>&lt;/a&gt; 【<strong>[+profile.filetype+]</strong>形式】&lt;/p&gt;</code><br />
-  表示例：　　<code>&lt;p&gt;&lt;a href=&quot;cfFileView?field=profile&quot; target=&quot;_blank&quot;&gt;○○のプロフィール.pdf&lt;/a&gt; 【PDF形式】&lt;/p&gt; </code></dd>
+  確認画面：　<code>&lt;p&gt;&lt;a href=&quot;<strong>[+profile.url+]</strong>&quot; target=&quot;_blank&quot;&gt;<strong>[+profile.filename+]</strong>&lt;/a&gt; 【<strong>[+profile.filetype+]</strong>形式】&lt;/p&gt;</code><br />
+  表示例：　　<code>&lt;p&gt;&lt;a href=&quot;/contact.html?cfm_file=profile&quot; target=&quot;_blank&quot;&gt;○○のプロフィール.pdf&lt;/a&gt; 【PDF形式】&lt;/p&gt; </code><br />
+  ※PDF は別画面で表示されます。テキスト形式のファイルは、表示されずにダウンロードになります。</dd>
 </dl>
 <h4>[その他仕様]</h4>
 <p>※アップロードされたファイルは、アップロード時のファイル名（クライアントマシンの元のファイル名）で添付されます。<br />

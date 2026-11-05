@@ -10,5 +10,8 @@
         <testsuite name="Characterization">
             <directory>tests/Characterization</directory>
         </testsuite>
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
     </testsuites>
 </phpunit>
