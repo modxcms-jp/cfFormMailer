@@ -223,6 +223,10 @@ class Class_cfFormMailer
         if (is_array($_FILES) && count($_FILES)) {
             unset($_SESSION['_cf_uploaded']);
             foreach ($_FILES as $field => $var) {
+                // フォームにあるファイルの項目だけを受ける（validate() で検証したものだけ）
+                if (($this->parsedForm[$field]['type'] ?? '') !== 'file') {
+                    continue;
+                }
                 if (!empty($var['error']) && $var['error'] !== $this->config('upload_err_ok')) {
                     continue;
                 }
@@ -264,6 +268,8 @@ class Class_cfFormMailer
         // ワンタイムトークンを生成
         $token = $this->getToken();
         $_SESSION['_cffm_token'] = $token;
+        // 検証を通った値（変換したあとのもの）を覚えておき、送信ではこれを使う
+        $_SESSION['_cffm_confirmed'] = $this->form;
         $text = str_ireplace(
             '</form>',
             sprintf(
@@ -686,6 +692,10 @@ class Class_cfFormMailer
         }
 
         $admin_addresses = $this->makeAdminAddress();
+        if (!$admin_addresses) {
+            $this->setError('管理者のメールアドレスが正しく設定されていません');
+            return false;
+        }
         $admin_address = $admin_addresses[0];
 
         // 管理者宛送信
@@ -727,7 +737,7 @@ class Class_cfFormMailer
         $pm->Sender = $pm->From;
         $pm->Body = $this->makeBody(
             $tmpl,
-            ($this->makePh($this->form, $admin_address))
+            ($this->makePh($this->form, $admin_address, $this->config('admin_ishtml')))
         );
         $this->applyMailCharset($pm);
 
@@ -809,9 +819,14 @@ class Class_cfFormMailer
             ? evo()->parseText($this->config('reply_subject'), $this->form)
             : '自動返信メール';
         $admin_addresses = $this->makeAdminAddress();
+        if (!$admin_addresses) {
+            $this->setError('管理者のメールアドレスが正しく設定されていません');
+            return false;
+        }
         $admin_address = $admin_addresses[0];
         $pm->setFrom(
-            $admin_address,
+            // 省略したときは、管理者のアドレス（複数あれば先頭）
+            $this->config('reply_from') ? $this->config('reply_from') : $admin_address,
             $this->config('reply_fromname')
         );
         // モバイル用のテンプレート切り替え
@@ -830,7 +845,7 @@ class Class_cfFormMailer
         $pm->Sender = $pm->From;
         $pm->Body = $this->makeBody(
             $tmpl_u,
-            ($this->makePh($this->form, $admin_address))
+            ($this->makePh($this->form, $admin_address, $this->config('reply_ishtml')))
         );
         $this->applyMailCharset($pm);
         // 添付ファイル処理
@@ -912,7 +927,9 @@ class Class_cfFormMailer
             return;
         }
         foreach ($uploaded as $attach_file) {
-            unlink($attach_file['path']);
+            if (is_file($attach_file['path'] ?? '')) {
+                unlink($attach_file['path']);
+            }
         }
         unset($_SESSION['_cf_uploaded']);
     }
@@ -959,7 +976,15 @@ class Class_cfFormMailer
         $pm->Encoding = 'base64';
     }
 
-    private function makePh($form, $adminmail)
+    /**
+     * メール本文のプレースホルダの値を作る
+     *
+     * @param array  $form      フォームの値
+     * @param string $adminmail 管理者のメールアドレス
+     * @param mixed  $isHtml    HTML メールにするか（管理者宛は admin_ishtml、自動返信は reply_ishtml）
+     * @return array
+     */
+    private function makePh($form, $adminmail, $isHtml)
     {
         $remote_addr = serverv('REMOTE_ADDR', '');
         $user_agent = serverv('HTTP_USER_AGENT', '');
@@ -972,7 +997,7 @@ class Class_cfFormMailer
             'sender_ua'   => $this->encodeHTML($user_agent),
             'reply_to'    => $this->getAutoReplyAddress(),
         );
-        if (!$this->config('reply_ishtml')) {
+        if (!$isHtml) {
             return $form + $additional;
         }
         if (!$this->config('allow_html')) {
@@ -1099,9 +1124,10 @@ class Class_cfFormMailer
         if (isset($errors['errors'])) unset($errors['errors']);
         $keys = array_unique(array_keys($errors));
         foreach ($keys as $field) {
+            // name="xxx[]" の項目にも付ける
             $pattern = sprintf(
-                "#<(input|textarea|select)[^>]*?name=([\"'])%s\\2[^/>]*/?>#uim",
-                str_replace('error.', '', $field)
+                "#<(input|textarea|select)[^>]*?name=([\"'])%s(?:\\[\\])?\\2[^/>]*/?>#uim",
+                preg_quote(str_replace('error.', '', $field), '#')
             );
             if (!preg_match_all($pattern, $html, $match, PREG_SET_ORDER)) {
                 continue;
@@ -1636,7 +1662,7 @@ class Class_cfFormMailer
                 $label = $param;
             } elseif (preg_match("/id=([\"'])(.+?)\\1/", $v[0], $l_match)) {
                 if (preg_match(
-                    "@<label for=([\"']){$l_match[2]}\\1.*>(.+?)</label>@",
+                    sprintf("@<label for=([\"'])%s\\1.*>(.+?)</label>@", preg_quote($l_match[2], '@')),
                     $html,
                     $match_label
                 )) {
@@ -1763,7 +1789,28 @@ class Class_cfFormMailer
     }
 
     /**
-     * 入力値をセッションに待避
+     * 送信では、確認画面を出したときに検証を通った値を使う
+     *
+     * 確認画面の hidden の値は書き換えられるので、送られてきた値は使わない。
+     * 検証し直すと、変換のある検証（zip でハイフンを足すなど）と len() を組み合わせたときに、
+     * 変換したあとの値ではじかれてしまうため、検証済みの値をそのまま使う。
+     *
+     * @access public
+     * @return boolean 検証済みの値が無ければ false
+     */
+    public function useConfirmedForm()
+    {
+        $confirmed = $_SESSION['_cffm_confirmed'] ?? null;
+        unset($_SESSION['_cffm_confirmed']);
+        if (!is_array($confirmed) || !$confirmed) {
+            return false;
+        }
+        $this->form = $confirmed;
+        return true;
+    }
+
+    /**
+     * 送信したデータをセッションに格納
      *
      * @access public
      * @param  void
@@ -1912,8 +1959,10 @@ class Class_cfFormMailer
                 $reply_to[] = '@';
                 continue;
             }
-            if (empty($this->form[$t])) {
-                exit('reply_toの設定が正しくありません');
+            // 欄が空、または配列で送られたときは、自動返信先なしとする
+            // （validate() が形式の誤りとして扱う）
+            if (empty($this->form[$t]) || !is_string($this->form[$t])) {
+                return '';
             }
             $reply_to[] = $this->form[$t];
         }
@@ -2010,7 +2059,8 @@ class Class_cfFormMailer
         if (strpos($lang, 'euc') !== false) {
             return 'euc-jp';
         }
-        return $lang;
+        // それ以外の言語（english など）は utf-8 とする
+        return 'utf-8';
     }
     /**
      * 環境設定の読み込み

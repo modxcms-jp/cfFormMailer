@@ -1,0 +1,10 @@
+<ul>[+errors|implodetag(li)+]</ul>
+<form action="[~[*id*]~]" method="post" enctype="multipart/form-data">
+  <label for="f.name@1">お名前</label>
+  <input type="text" name="name" id="f.name@1" valid="1" />
+  <input type="checkbox" name="items[]" value="A" valid="1::品目" />A
+  <input type="checkbox" name="items[]" value="B" />B
+  <label for="f_attach">添付ファイル</label>
+  <input type="file" name="attach" id="f_attach" />
+  <input type="submit" value="確認" />
+</form>

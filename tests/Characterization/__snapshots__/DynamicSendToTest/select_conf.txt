@@ -8,6 +8,11 @@
 
 == session ==
 array (
+  '_cffm_confirmed' => 
+  array (
+    'dept' => '営業',
+    'name' => '山田',
+  ),
   '_cffm_token' => '<TOKEN>',
   'dynamic_send_to' => 
   array (
