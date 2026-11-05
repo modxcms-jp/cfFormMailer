@@ -251,6 +251,8 @@ class Class_cfFormMailer
                     $values[sprintf('%s.filename', $field)] = $name;
                     $values[sprintf('%s.filetype', $field)] = $type;
                 }
+                // 確認画面でファイルを開く URL（スニペットがファイルを返す）
+                $values[sprintf('%s.url', $field)] = \CfFormMailer\Upload\FileView::url($field);
             }
         }
         $text = $this->addHiddenTags(

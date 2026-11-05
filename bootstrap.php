@@ -23,6 +23,11 @@ define('CFM_PATH', __DIR__ . '/');
 
 require_once CFM_PATH . 'src/autoload.php';
 
+// 確認画面で、アップロードされたファイルを見せる（[+項目.url+] のリンク先）
+if (isset($_GET[\CfFormMailer\Upload\FileView::QUERY_KEY])) {
+    \CfFormMailer\Upload\FileView::respond($_GET[\CfFormMailer\Upload\FileView::QUERY_KEY]);
+}
+
 $mf = new Class_cfFormMailer($modx);
 $mf->parseConfig($config);
 

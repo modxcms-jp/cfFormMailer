@@ -9,6 +9,10 @@ cfFormMailerの全バージョンの変更履歴を記録します。
 
 ## [Unreleased]
 
+### Added
+
+- **確認画面でアップロードされたファイルを表示するのに、プラグイン cfFileView が要らなくなった**。確認画面のテンプレートで `[+項目名.url+]` を使うと、スニペットが本人のファイルだけを返す（フォームのページの URL に `?cfm_file=項目名` を付けたもの）。以前の書き方 `cfFileView?field=項目名` を使っているサイトは、インストール済みのプラグインがそのまま動く。プラグインのコードを貼り直すと、スニペットと同じ返し方（`X-Content-Type-Options: nosniff`、画像（SVG を除く）と PDF のほかはダウンロードとして返す、ファイルが無ければ 404）になる
+
 ### Changed
 
 - **送信メールの文字コードの既定を `utf-8` に変更**（`mail_charset` が未指定・空欄の場合も `utf-8`）。本文に合わせて PHPMailer の `CharSet`・`Encoding` を指定する。JIS で送る場合は `mail_charset = iso-2022-jp` を指定する（#7）

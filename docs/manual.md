@@ -23,7 +23,7 @@
 
 2. （ファイルアップロードを使用する場合） 追加のライブラリは要りません。アップロードされたファイルの MIME タイプは、PHP の Fileinfo（標準で同梱）でファイルの中身から判定します。以前は class.upload.php の追加を推奨していましたが、今は不要です（置いてあっても使いません）。
 
-3. （ファイルアップロードを使用する場合） プラグインcfFileViewをインストールします。
+3. （ファイルアップロードを使用する場合） 確認画面でファイルを表示するのに、プラグインは要りません（[+フィールド名.url+] を使います）。以前の書き方 cfFileView?field= を使う場合だけ、プラグインcfFileViewをインストールします。
   「[ユーザーがアップロードしたファイルの添付送信](#ユーザーがアップロードしたファイルの添付送信)」を参照してください。
 
 4. （送信内容を記録する場合） cfFormDBモジュールをインストールします。
@@ -563,13 +563,11 @@ attach_fileは半角英数字に限定されるため、日本語名で送信し
 [注意]
 "SAFE MODE Restriction in effect"というエラーが発生する場合は、環境設定チャンクのupload_tmp_pathを1にしてみてください。
 
-#### [プラグインの追加]
+#### [以前の書き方（cfFileView?field=）を使う場合のプラグイン]
 
-**！送信内容確認画面でアップロードされたファイルを表示するには、プラグインの追加が必要です！**
+確認画面でファイルを表示するには、プレースホルダ **[+フィールド名.url+]** を使います（「確認画面でのファイル指定」を参照）。プラグインは要りません。
 
-アップロードされたファイルは、送信完了するまでブラウザからはアクセスできない一時ディレクトリに保管されるため、送信内容確認画面で表示するために追加処理が必要となります。
-以下の手順に従って、プラグインcfFileViewをインストールしてください。
-※確認画面でアップロードされたファイルを表示させない場合は、インストールする必要はありません。
+テンプレートに **cfFileView?field=フィールド名** と書いている場合だけ、プラグイン cfFileView が必要です。インストール済みのプラグインは、そのまま動きます。
 
 1. 以下の情報で新規プラグインを作成します。
     ■プラグイン名： **cfFileView**
@@ -585,9 +583,9 @@ attach_fileは半角英数字に限定されるため、日本語名で送信し
 
 #### [確認画面でのファイル指定]
 
-アップロードされたファイルは、プラグインcfFileViewを利用して表示させますので、<img>タグや<a>タグのURLとして、以下のように記述します。
+アップロードされたファイルは、送信が終わるまでブラウザからは直接開けない一時ディレクトリに保管されます。確認画面で表示するときは、<img>タグや<a>タグのURLとして、以下のように記述します。スニペットが、本人がアップロードしたファイルだけを返します。
 
-**cfFileView?field=フィールド名**
+**[+フィールド名.url+]**
 
 画像なら<img>タグのsrc属性、それ以外なら<a>タグのhref属性に指定して別画面で表示させるという方法が良いと思います。
 「テンプレートでの記述例」を参考にしてください。
@@ -620,22 +618,27 @@ GIF / JPG / PNG / PDF / TXT / HTML / WORD
 ファイルの形式。以下の何れかとなります。
 GIF / JPG / PNG / PDF / TXT / HTML / WORD
 
+##### 画像・画像以外のどちらでも
+
+**[+フィールド名.url+]**
+確認画面でファイルを開く URL（フォームのページの URL に ?cfm_file=フィールド名 を付けたもの）
+
 #### [テンプレートでの記述例]
 
 **画像の場合(1)**
 入力画面：　`<p>写真<input type="file" name="pic" valid=":allowsize(1024)" /></p>`
-確認画面：　`<p>写真： <img src="cfFileView?field=pic" width="[+pic.imagewidth+]" height="[+pic.imageheight+]" alt="[+pic.imagename+]" /></p>`
-表示例：　　`<p>写真： <img src="cfFileView?field=pic" width="240" height="320" alt="画像です.jpg" /></p>`
+確認画面：　`<p>写真： <img src="[+pic.url+]" width="[+pic.imagewidth+]" height="[+pic.imageheight+]" alt="[+pic.imagename+]" /></p>`
+表示例：　　`<p>写真： <img src="/contact.html?cfm_file=pic" width="240" height="320" alt="画像です.jpg" /></p>`
 
 **画像の場合(2)**
 入力画面：　`<p>写真<input type="file" name="photo" valid=":allowtype(gif|jpg)" /></p>`
-確認画面：　`<p>写真： <img src="cfFileView?field=photo" alt="" width="100" /></p>`
-表示例：　　`<p>写真： <img src="cfFileView?field=photo" alt="" width="100" /></p>`
+確認画面：　`<p>写真： <img src="[+photo.url+]" alt="" width="100" /></p>`
+表示例：　　`<p>写真： <img src="/contact.html?cfm_file=photo" alt="" width="100" /></p>`
 
 **画像以外のファイルの場合**
 入力画面：　`<p><input type="file" name="profile" valid="1:allowtype(pdf|txt)" /> PDFまたはテキスト形式のプロフィールをアップロードしてください</p>`
-確認画面：　`<p><a href="cfFileView?field=profile" target="_blank">[+profile.filename+]</a> 【[+profile.filetype+]形式】</p>`
-表示例：　　`<p><a href="cfFileView?field=profile" target="_blank">○○のプロフィール.pdf</a> 【PDF形式】</p>`
+確認画面：　`<p><a href="[+profile.url+]" target="_blank">[+profile.filename+]</a> 【[+profile.filetype+]形式】</p>`
+表示例：　　`<p><a href="/contact.html?cfm_file=profile" target="_blank">○○のプロフィール.pdf</a> 【PDF形式】</p>`
 
 #### [その他仕様]
 
