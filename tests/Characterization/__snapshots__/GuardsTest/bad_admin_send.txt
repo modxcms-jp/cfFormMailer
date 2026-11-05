@@ -1,0 +1,7 @@
+== return ==
+<p style="color:#cc0000;background:#fff;font-weight:bold;">SYSTEM ERROR::管理者のメールアドレスが正しく設定されていません</p>
+
+== session ==
+array (
+  'dynamic_send_to' => NULL,
+)

@@ -219,6 +219,10 @@ class Class_cfFormMailer
         if (is_array($_FILES) && count($_FILES)) {
             unset($_SESSION['_cf_uploaded']);
             foreach ($_FILES as $field => $var) {
+                // フォームにあるファイルの項目だけを受ける（validate() で検証したものだけ）
+                if (($this->parsedForm[$field]['type'] ?? '') !== 'file') {
+                    continue;
+                }
                 if (!empty($var['error']) && $var['error'] !== $this->config('upload_err_ok')) {
                     continue;
                 }
@@ -649,6 +653,10 @@ class Class_cfFormMailer
         }
 
         $admin_addresses = $this->makeAdminAddress();
+        if (!$admin_addresses) {
+            $this->setError('管理者のメールアドレスが正しく設定されていません');
+            return false;
+        }
         $admin_address = $admin_addresses[0];
 
         // 管理者宛送信
@@ -772,6 +780,10 @@ class Class_cfFormMailer
             ? evo()->parseText($this->config('reply_subject'), $this->form)
             : '自動返信メール';
         $admin_addresses = $this->makeAdminAddress();
+        if (!$admin_addresses) {
+            $this->setError('管理者のメールアドレスが正しく設定されていません');
+            return false;
+        }
         $admin_address = $admin_addresses[0];
         $pm->setFrom(
             // 省略したときは、管理者のアドレス（複数あれば先頭）
@@ -876,7 +888,9 @@ class Class_cfFormMailer
             return;
         }
         foreach ($uploaded as $attach_file) {
-            unlink($attach_file['path']);
+            if (is_file($attach_file['path'] ?? '')) {
+                unlink($attach_file['path']);
+            }
         }
         unset($_SESSION['_cf_uploaded']);
     }
@@ -1071,9 +1085,10 @@ class Class_cfFormMailer
         if (isset($errors['errors'])) unset($errors['errors']);
         $keys = array_unique(array_keys($errors));
         foreach ($keys as $field) {
+            // name="xxx[]" の項目にも付ける
             $pattern = sprintf(
-                "#<(input|textarea|select)[^>]*?name=([\"'])%s\\2[^/>]*/?>#uim",
-                str_replace('error.', '', $field)
+                "#<(input|textarea|select)[^>]*?name=([\"'])%s(?:\\[\\])?\\2[^/>]*/?>#uim",
+                preg_quote(str_replace('error.', '', $field), '#')
             );
             if (!preg_match_all($pattern, $html, $match, PREG_SET_ORDER)) {
                 continue;
@@ -1601,7 +1616,7 @@ class Class_cfFormMailer
                 $label = $param;
             } elseif (preg_match("/id=([\"'])(.+?)\\1/", $v[0], $l_match)) {
                 if (preg_match(
-                    "@<label for=([\"']){$l_match[2]}\\1.*>(.+?)</label>@",
+                    sprintf("@<label for=([\"'])%s\\1.*>(.+?)</label>@", preg_quote($l_match[2], '@')),
                     $html,
                     $match_label
                 )) {
