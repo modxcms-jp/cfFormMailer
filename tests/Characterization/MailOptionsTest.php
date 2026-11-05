@@ -53,6 +53,12 @@ class MailOptionsTest extends CharacterizationTestCase
     }
 
     /** @test */
+    public function 組み立てるreply_toの欄に配列が送られたら入力エラーにする(): void
+    {
+        $this->assertSnapshot('reply_to_part_array', $this->confirm(self::ADMIN_HTML, ['m1' => ['taro']]));
+    }
+
+    /** @test */
     public function 管理者宛だけHTMLメールなら管理者宛だけエスケープする(): void
     {
         $this->assertSnapshot('admin_html', $this->confirmAndSend(self::ADMIN_HTML));
