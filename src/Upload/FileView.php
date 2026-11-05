@@ -9,8 +9,8 @@ namespace CfFormMailer\Upload;
  * どこにあるかは本人のセッション（_cf_uploaded）にしか無い。そのため、URL で直接は開けない。
  * セッションを見て、本人にだけファイルを返す。
  *
- * - スニペット：フォームのページに ?cfm_file=項目名 を付けて呼ぶ（確認画面の [+項目.url+]）
- * - プラグイン cfFileView：cfFileView?field=項目名（以前の書き方。互換のために残す）
+ * スニペットが、フォームのページに ?cfm_file=項目名 を付けて呼ばれたときに使う（確認画面の [+項目.url+]）。
+ * 以前のプラグイン cfFileView（cfFileView?field=項目名）からも呼ぶが、対応している MODX ではそのプラグインは働かない。
  */
 class FileView
 {
