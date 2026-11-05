@@ -49,7 +49,7 @@ strong { font-size: large;}
     </ul>
   </li>
   <li>（ファイルアップロードを使用する場合） 追加のライブラリは要りません。アップロードされたファイルの MIME タイプは、PHP の Fileinfo（標準で同梱）でファイルの中身から判定します。以前は class.upload.php の追加を推奨していましたが、今は不要です（置いてあっても使いません）。</li>
-  <li>（ファイルアップロードを使用する場合） 確認画面でファイルを表示するのに、プラグインは要りません（[+フィールド名.url+] を使います）。以前の書き方 cfFileView?field= を使う場合だけ、プラグインcfFileViewをインストールします。<br />
+  <li>（ファイルアップロードを使用する場合） 確認画面でファイルを表示するのに、プラグインは要りません（[+フィールド名.url+] を使います）。以前の書き方 cfFileView?field= とプラグイン cfFileView は、対応している MODX では動かないので、[+フィールド名.url+] に書き換えてください。<br />
   「<a href="#upload">ユーザーがアップロードしたファイルの添付送信</a>」を参照してください。  </li>
   <li>（送信内容を記録する場合） cfFormDBモジュールをインストールします。<br />
   詳細はcfFormDBのマニュアルを参照してください。</li>
@@ -521,16 +521,9 @@ docomo.ne.jp / ezweb.ne.jp / softbank.ne.jp / vodafone.ne.jp / disney.ne.jp / pd
 検証メソッドallowtypeとallowsizeで、アップロードできるファイルを限定することをお勧めします。<br />
 [注意]
 &quot;SAFE MODE Restriction in effect&quot;というエラーが発生する場合は、環境設定チャンクのupload_tmp_pathを1にしてみてください。</p>
-<h4>[以前の書き方（cfFileView?field=）を使う場合のプラグイン]</h4>
+<h4>[以前の書き方（cfFileView?field=）からの書き換え]</h4>
 <p>確認画面でファイルを表示するには、プレースホルダ <strong>[+フィールド名.url+]</strong> を使います（「確認画面でのファイル指定」を参照）。プラグインは要りません。</p>
-<p>テンプレートに <strong>cfFileView?field=フィールド名</strong> と書いている場合だけ、プラグイン cfFileView が必要です。インストール済みのプラグインは、そのまま動きます。</p>
-<ol>
-  <li>以下の情報で新規プラグインを作成します。<em><br />
-  </em>■プラグイン名： <strong>cfFileView</strong><br />
-  ■プラグインコード： ダウンロードしたcfFormMailerパッケージ内の<strong>plugin.cfFileView.php</strong>ファイルの内容をコピー＆ペースト</li>
-  <li>システムイベントタブをクリックし、<strong>OnPageNotFound</strong>にチェックを入れます。</li>
-</ol>
-<p>以上でインストール完了です。</p>
+<p>以前は、確認画面に <strong>cfFileView?field=フィールド名</strong> と書き、プラグイン cfFileView で表示していました。このプラグインは、対応している MODX（evolution-jp 1.2 以降）では動きません（見つからないページの判定のしかたが変わったため、404 になります）。確認画面のテンプレートの <strong>cfFileView?field=フィールド名</strong> を <strong>[+フィールド名.url+]</strong> に書き換えてください。書き換えたら、プラグイン cfFileView は削除してかまいません。</p>
 <h4>[ファイルの追加]</h4>
 <p>アップロードされたファイルの MIME タイプは、PHP の Fileinfo（標準で同梱）でファイルの中身から判定します。以前は class.upload.php の追加を推奨していましたが、今は不要です（置いてあっても使いません）。</p>
 <h4>[確認画面でのファイル指定]</h4>

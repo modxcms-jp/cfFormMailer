@@ -1,11 +1,12 @@
 //<?php
 /**
  * cfFileView
- * cfFormMailer用アップロードファイル表示（以前の書き方の互換用）
+ * cfFormMailer用アップロードファイル表示（以前の書き方。使わない）
  *
- * 確認画面で [+項目名.url+] を使えば、このプラグインは要らない。
- * テンプレートに cfFileView?field=項目名 と書いているサイトのために残している。
- * 処理はスニペット側（src/Upload/FileView.php）と同じものを呼ぶ。
+ * 確認画面では [+項目名.url+] を使う。このプラグインは要らない。
+ * 対応している MODX（evolution-jp 1.2 以降）では、見つからないページの documentIdentifier が 0 になるため、
+ * 下の判定が成り立たず、このプラグインは働かない（cfFileView?field= は 404 になる）。
+ * テンプレートの cfFileView?field=項目名 は、[+項目名.url+] に書き換える。
  *
  * @version 1.2
  * @author Clefarray Factory

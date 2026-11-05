@@ -56,7 +56,7 @@ cfFormMailerのインストール手順を説明します。
 ├── additionalMethods.inc.php        # カスタム検証・フィルター（任意。extras/ の見本を写して作る）
 ├── extras/
 │   ├── additionalMethods.inc.php   # カスタム検証・フィルターの見本
-│   └── plugin.cfFileView.php       # ファイル表示プラグイン（以前の書き方 cfFileView?field= を使うときだけ）
+│   └── plugin.cfFileView.php       # 以前のファイル表示プラグイン（使わない。[+項目名.url+] に書き換える）
 └── forms/
     └── sample/                      # サンプルテンプレート
         ├── config.with_comment.ini
@@ -211,22 +211,22 @@ Content-Type には、ファイルの中身から判定した種類（Fileinfo�
 
 #### 以前の書き方（cfFileView?field=）を使っているサイト
 
-テンプレートに `cfFileView?field=項目名` と書いているサイトは、これまでどおりプラグイン cfFileView で表示されます。
-インストール済みのプラグインは、何もしなくてもそのまま動きます。
-テンプレートを `[+項目名.url+]` に書き換えれば、プラグインは要らなくなります（削除してかまいません）。
-新しくインストールする場合や、ファイルの返し方の改善（`X-Content-Type-Options: nosniff`、HTML などをダウンロードとして返す）を取り込む場合は、次の手順でプラグインのコードを貼り直してください。
+以前は、確認画面に `cfFileView?field=項目名` と書き、プラグイン cfFileView でファイルを表示していました。
+このプラグインは、対応している MODX（evolution-jp 1.2 以降）では動きません（`cfFileView?field=` は 404 になります）。
+プラグインは、存在しないページ `cfFileView` へのアクセスを `OnPageNotFound` で拾い、`documentIdentifier` が `cfFileView` かどうかで判定しています。
+ところが、これらの版では、見つからないページの `documentIdentifier` が `0` になるため、プラグインが働きません。
 
-1. **エレメント** → **プラグイン** → **新規プラグイン**（または既存の cfFileView を開く）
-2. 以下の情報を入力:
+確認画面のテンプレートの `cfFileView?field=項目名` を、`[+項目名.url+]` に書き換えてください。
 
-   | 項目 | 値 |
-   |------|-----|
-   | **プラグイン名** | `cfFileView` |
-   | **プラグインコード** | `extras/plugin.cfFileView.php`の内容 |
+```html
+<!-- 以前 -->
+<img src="cfFileView?field=photo" alt="" />
+<!-- 今 -->
+<img src="[+photo.url+]" alt="" />
+```
 
-3. **システムイベント** タブをクリック
-4. **OnPageNotFound** にチェック
-5. **保存**
+書き換えたら、プラグイン cfFileView は削除してかまいません。残しておいても、`[+項目名.url+]` の動きには影響しません。
+新しくインストールする必要はありません。
 
 #### 3. テンプレートでの使用
 
