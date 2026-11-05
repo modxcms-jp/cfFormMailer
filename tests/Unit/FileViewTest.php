@@ -46,6 +46,12 @@ class FileViewTest extends TestCase
     /** @test */
     public function URLはフォームのページにcfm_fileを付ける(): void
     {
-        $this->assertSame('[~[*id*]~]?cfm_file=my%20photo', FileView::url('my photo'));
+        $this->assertSame('/contact.html?cfm_file=my%20photo', FileView::url('/contact.html', 'my photo'));
+    }
+
+    /** @test */
+    public function フレンドリーURLが無効ならアンパサンドでつなぐ(): void
+    {
+        $this->assertSame('/index.php?id=42&cfm_file=attach', FileView::url('/index.php?id=42', 'attach'));
     }
 }

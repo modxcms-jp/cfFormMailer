@@ -1,5 +1,5 @@
 == return ==
-<p><a href="[~[*id*]~]?cfm_file=attach">upload.txt</a> (TXT)</p>
+<p><a href="url:1?cfm_file=attach">upload.txt</a> (TXT)</p>
 <form action="[~[*id*]~]" method="post"><input type="hidden" name="_mode" value="send" />
   <input type="submit" value="送信する" />
 <input type="hidden" name="name" value="山田" /><input type="hidden" name="_cffm_token" value="<TOKEN>" /></form>

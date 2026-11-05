@@ -252,7 +252,10 @@ class Class_cfFormMailer
                     $values[sprintf('%s.filetype', $field)] = $type;
                 }
                 // 確認画面でファイルを開く URL（スニペットがファイルを返す）
-                $values[sprintf('%s.url', $field)] = \CfFormMailer\Upload\FileView::url($field);
+                $values[sprintf('%s.url', $field)] = evo()->htmlspecialchars(
+                    \CfFormMailer\Upload\FileView::url(evo()->makeUrl(evo()->documentIdentifier), $field),
+                    ENT_QUOTES
+                );
             }
         }
         $text = $this->addHiddenTags(

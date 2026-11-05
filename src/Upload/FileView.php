@@ -23,14 +23,17 @@ class FileView
     /**
      * 確認画面から、その項目のファイルを開く URL
      *
-     * フォームのページの URL に ?cfm_file=項目名 を付ける（[~[*id*]~] は MODX が URL に置き換える）。
+     * フォームのページの URL に cfm_file=項目名 を付ける。ページの URL にすでに ? があれば
+     * （フレンドリー URL が無効で index.php?id=… のとき）& でつなぐ。HTML には書き出す側でエスケープする。
      *
-     * @param string $field 項目名
+     * @param string $pageUrl フォームのページの URL
+     * @param string $field   項目名
      * @return string
      */
-    public static function url($field)
+    public static function url($pageUrl, $field)
     {
-        return '[~[*id*]~]?' . self::QUERY_KEY . '=' . rawurlencode($field);
+        $separator = strpos($pageUrl, '?') === false ? '?' : '&';
+        return $pageUrl . $separator . self::QUERY_KEY . '=' . rawurlencode($field);
     }
 
     /**
