@@ -24,6 +24,7 @@ from: admin@example.com
 sender: admin@example.com
 subject: 問い合わせ
 charset: utf-8 / encoding: base64
+is_html: false
 body:
 お名前: 山田
 お問い合わせ先: その他

@@ -22,6 +22,7 @@ from: admin@example.com
 sender: admin@example.com
 subject: 問い合わせ
 charset: utf-8 / encoding: base64
+is_html: true
 body:
 返信先: taro@example.com
 メモ: &lt;b&gt;太字&lt;/b&gt;
@@ -32,6 +33,7 @@ from: テストサイト <admin@example.com>
 sender: admin@example.com
 subject: ありがとうございます
 charset: utf-8 / encoding: base64
+is_html: false
 body:
 返信先: taro@example.com
 メモ: <b>太字</b>

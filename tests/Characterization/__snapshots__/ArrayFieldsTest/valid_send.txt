@@ -32,6 +32,7 @@ from: admin@example.com
 sender: admin@example.com
 subject: 問い合わせ
 charset: utf-8 / encoding: base64
+is_html: false
 body:
 電話番号: 03-1234-5678
 
