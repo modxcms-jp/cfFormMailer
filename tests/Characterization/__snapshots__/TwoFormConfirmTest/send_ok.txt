@@ -48,6 +48,7 @@ from: example@example.com
 sender: example@example.com
 subject: 問い合わせフォームからの送信
 charset: utf-8 / encoding: base64
+is_html: false
 body:
 ---------------------------------------
 メールフォームから送信されたメールです
@@ -90,6 +91,7 @@ from: テストサイト <example@example.com>
 sender: example@example.com
 subject: お問い合わせありがとうございます
 charset: utf-8 / encoding: base64
+is_html: false
 body:
 ---------------------------------------
 山田 太郎 様

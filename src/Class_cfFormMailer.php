@@ -745,6 +745,8 @@ class Class_cfFormMailer
             $tmpl,
             ($this->makePh($this->form, $admin_address, $this->config('admin_ishtml')))
         );
+        // メールの種類は admin_ishtml で決める（MODxMailer の既定はサイト全体の設定で決まるため）
+        $pm->IsHTML((bool) $this->config('admin_ishtml'));
         $this->applyMailCharset($pm);
 
         // ユーザーからのファイル送信
@@ -853,6 +855,8 @@ class Class_cfFormMailer
             $tmpl_u,
             ($this->makePh($this->form, $admin_address, $this->config('reply_ishtml')))
         );
+        // メールの種類は reply_ishtml で決める（MODxMailer の既定はサイト全体の設定で決まるため）
+        $pm->IsHTML((bool) $this->config('reply_ishtml'));
         $this->applyMailCharset($pm);
         // 添付ファイル処理
         if ($this->config('attach_file') && is_file($this->config('attach_file'))) {
