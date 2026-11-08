@@ -86,7 +86,7 @@ body:
 
 --- mail #2
 to: taro@example.com
-from: example@example.com
+from: テストサイト <example@example.com>
 sender: example@example.com
 subject: お問い合わせありがとうございます
 charset: utf-8 / encoding: base64
