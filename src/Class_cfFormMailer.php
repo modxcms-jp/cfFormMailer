@@ -241,9 +241,11 @@ class Class_cfFormMailer
                 ) . $this->extension($var['tmp_name']);
                 evo()->move_uploaded_file($var['tmp_name'], $confirm_tmp_name);
                 $mime = $this->_getMimeType($confirm_tmp_name, $field);
+                // 保存の場所は一時ファイルの名前のまま。メールの添付には、送られたときのファイル名を使う
                 $_SESSION['_cf_uploaded'][$field] = array(
                     'path' => $confirm_tmp_name,
-                    'mime' => $mime
+                    'mime' => $mime,
+                    'name' => is_string($var['name'] ?? null) ? $var['name'] : ''
                 );
                 // プレースホルダ定義
                 $name =  evo()->htmlspecialchars($var['name'], ENT_QUOTES);
@@ -755,14 +757,7 @@ class Class_cfFormMailer
                 if (!is_file($attach_file['path'])) {
                     continue;
                 }
-                $pm->AddAttachment(
-                    $attach_file['path'],
-                    mb_convert_encoding(
-                        urldecode(basename($attach_file['path'])),
-                        $this->mailCharset(),
-                        $this->config('charset')
-                    )
-                );
+                $pm->AddAttachment($attach_file['path'], $this->attachmentName($attach_file));
                 if (!$upload_flag) {
                     $upload_flag = true;
                 }
@@ -877,14 +872,7 @@ class Class_cfFormMailer
                 if (!is_file($attach_file['path'])) {
                     continue;
                 }
-                $pm->AddAttachment(
-                    $attach_file['path'],
-                    mb_convert_encoding(
-                        urldecode(basename($attach_file['path'])),
-                        $this->mailCharset(),
-                        $this->config('charset')
-                    )
-                );
+                $pm->AddAttachment($attach_file['path'], $this->attachmentName($attach_file));
                 $has_uploaded_attachment = true;
             }
         }
@@ -921,6 +909,24 @@ class Class_cfFormMailer
 
         $this->debugLog('自動返信メール送信に成功しました');
         return true;
+    }
+
+    /**
+     * アップロードされたファイルを、メールに添付するときの名前
+     *
+     * 送られたときのファイル名を使う。それが無いとき（この版より前に保存したセッション）は、
+     * これまでどおり保存した一時ファイルの名前を使う。
+     *
+     * @param array $attach_file セッションの _cf_uploaded の 1 項目
+     * @return string メールの文字コードにしたファイル名
+     */
+    private function attachmentName(array $attach_file)
+    {
+        $name = $attach_file['name'] ?? '';
+        if (!is_string($name) || $name === '') {
+            $name = urldecode(basename($attach_file['path']));
+        }
+        return mb_convert_encoding($name, $this->mailCharset(), $this->config('charset'));
     }
 
     public function cleanUploadedFiles()
