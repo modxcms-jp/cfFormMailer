@@ -12,6 +12,7 @@ array (
     'attach' => 
     array (
       'mime' => 'text/plain',
+      'name' => 'ok.txt',
       'path' => '<SITE>/assets/snippets/cfFormMailer/tmp/upload.txt',
     ),
   ),

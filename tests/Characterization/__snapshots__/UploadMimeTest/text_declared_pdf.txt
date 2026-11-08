@@ -12,6 +12,7 @@ array (
     'attach' => 
     array (
       'mime' => 'text/plain',
+      'name' => 'fake.pdf',
       'path' => '<SITE>/assets/snippets/cfFormMailer/tmp/fake.pdf',
     ),
   ),

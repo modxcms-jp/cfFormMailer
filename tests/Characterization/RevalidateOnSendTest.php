@@ -19,9 +19,9 @@ class RevalidateOnSendTest extends CharacterizationTestCase
 {
     private const CONFIG = '@FILE:assets/snippets/cfFormMailer/forms/_t/revalidate/config.ini';
 
-    private function confirm(): array
+    private function confirm(string $fixture = 'upload.txt', string $name = 'upload.txt', string $type = 'text/plain'): array
     {
-        $path = SiteFixture::snippetPath() . '/forms/_t/paths/upload.txt';
+        $path = SiteFixture::snippetPath() . '/forms/_t/paths/' . $fixture;
         return $this->runStep([
             'snippet_params' => ['config' => self::CONFIG],
             'post' => [
@@ -32,8 +32,8 @@ class RevalidateOnSendTest extends CharacterizationTestCase
                 'veri' => 'abcd',
             ],
             'files' => ['attach' => [
-                'name' => 'upload.txt',
-                'type' => 'text/plain',
+                'name' => $name,
+                'type' => $type,
                 'tmp_name' => $path,
                 'error' => 0,
                 'size' => filesize($path),
@@ -85,5 +85,13 @@ class RevalidateOnSendTest extends CharacterizationTestCase
         $session = $confirm['session'];
         unset($session['_cffm_confirmed']);
         $this->assertSnapshot('send_without_confirm', $this->send($confirm, [], $session));
+    }
+
+    /** @test */
+    public function 添付したファイルは送られたときのファイル名でメールに付く(): void
+    {
+        // 一時ファイルの名前（document.pdf）と、送られたときのファイル名（見積書.pdf）が違う
+        $confirm = $this->confirm('document.pdf', '見積書.pdf', 'application/pdf');
+        $this->assertSnapshot('send_original_filename', $this->send($confirm, []));
     }
 }

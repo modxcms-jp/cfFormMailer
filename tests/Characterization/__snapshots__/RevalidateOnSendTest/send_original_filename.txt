@@ -1,0 +1,45 @@
+== return ==
+<h3>メール送信が完了しました。</h3>
+<p>お問い合わせいただき、ありがとうございました。</p>
+<p><a href="[(base_url)]">トップに戻る</a></p>
+
+== session ==
+array (
+  '_cffm_recently_send' => 
+  array (
+    'email' => 'taro@example.com',
+    'name' => '山田',
+    'veri' => 'abcd',
+    'zip' => '123-4567',
+  ),
+  'dynamic_send_to' => NULL,
+  'veriword' => 'abcd',
+)
+
+== mails ==
+--- mail #1
+to: admin@example.com
+reply_to: taro@example.com
+from: admin@example.com
+sender: admin@example.com
+subject: 問い合わせ
+charset: utf-8 / encoding: base64
+is_html: false
+attachment: <SITE>/assets/snippets/cfFormMailer/tmp/document.pdf (見積書.pdf)
+body:
+お名前: 山田
+メール: taro@example.com
+郵便番号: 123-4567
+
+--- mail #2
+to: taro@example.com
+from: テストサイト <admin@example.com>
+sender: admin@example.com
+subject: ありがとうございます
+charset: utf-8 / encoding: base64
+is_html: false
+attachment: <SITE>/assets/snippets/cfFormMailer/tmp/document.pdf (見積書.pdf)
+body:
+お名前: 山田
+メール: taro@example.com
+郵便番号: 123-4567
