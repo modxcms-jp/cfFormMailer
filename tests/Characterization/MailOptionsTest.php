@@ -13,6 +13,7 @@ class MailOptionsTest extends CharacterizationTestCase
 {
     private const ADMIN_HTML = '@FILE:assets/snippets/cfFormMailer/forms/_t/mail_options/config_admin_html.ini';
     private const REPLY_HTML = '@FILE:assets/snippets/cfFormMailer/forms/_t/mail_options/config_reply_html.ini';
+    private const NO_SEND = '@FILE:assets/snippets/cfFormMailer/forms/_t/mail_options/config_no_send.ini';
     private const EMPTY_VALUES = '@FILE:assets/snippets/cfFormMailer/forms/_t/mail_options/config_empty_values.ini';
 
     private function confirm(string $config, array $post): array
@@ -69,6 +70,12 @@ class MailOptionsTest extends CharacterizationTestCase
     public function 自動返信だけHTMLメールなら自動返信だけエスケープする(): void
     {
         $this->assertSnapshot('reply_html', $this->confirmAndSend(self::REPLY_HTML));
+    }
+
+    /** @test */
+    public function send_mailが0ならメールを送らずに完了の画面を出す(): void
+    {
+        $this->assertSnapshot('no_send', $this->confirmAndSend(self::NO_SEND));
     }
 
     /** @test */
