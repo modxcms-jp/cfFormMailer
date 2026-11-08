@@ -14,6 +14,7 @@ class MailOptionsTest extends CharacterizationTestCase
     private const ADMIN_HTML = '@FILE:assets/snippets/cfFormMailer/forms/_t/mail_options/config_admin_html.ini';
     private const REPLY_HTML = '@FILE:assets/snippets/cfFormMailer/forms/_t/mail_options/config_reply_html.ini';
     private const NO_SEND = '@FILE:assets/snippets/cfFormMailer/forms/_t/mail_options/config_no_send.ini';
+    private const EMPTY_VALUES = '@FILE:assets/snippets/cfFormMailer/forms/_t/mail_options/config_empty_values.ini';
 
     private function confirm(string $config, array $post): array
     {
@@ -75,5 +76,11 @@ class MailOptionsTest extends CharacterizationTestCase
     public function send_mailが0ならメールを送らずに完了の画面を出す(): void
     {
         $this->assertSnapshot('no_send', $this->confirmAndSend(self::NO_SEND));
+    }
+
+    /** @test */
+    public function 設定の値が空の行は省略として既定値を使う(): void
+    {
+        $this->assertSnapshot('empty_values', $this->confirmAndSend(self::EMPTY_VALUES));
     }
 }

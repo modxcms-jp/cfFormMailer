@@ -2100,6 +2100,10 @@ class Class_cfFormMailer
                 continue;
             }
             $val = trim($parts[1] ?? '');
+            // 値が空の行は「省略」として扱い、既定値を残す（1.3 と同じ）
+            if ($val === '' && array_key_exists($key, $cfg)) {
+                continue;
+            }
             $cfg[$key] = $val;
         }
 
