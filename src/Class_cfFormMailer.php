@@ -661,8 +661,9 @@ class Class_cfFormMailer
      */
     public function sendMail()
     {
+        // send_mail = 0 のときは送らずに成功として扱い、完了の画面へ進める（1.3 と同じ）
         if (!$this->config('send_mail')) {
-            return false;
+            return true;
         }
 
         if (!$this->form) {
