@@ -2695,7 +2695,10 @@ class Class_cfFormMailer
     /**
      * dateformat(format) : 日付のフォーマット
      *
-     * strftime形式（%Y-%m-%d等）とdate形式（Y-m-d等）の両方に対応
+     * strftime形式（%Y-%m-%d等）とdate形式（Y-m-d等）の両方に対応。
+     * strftime形式は strftime() を使わず（PHP 8.1 から非推奨で、先頭の 0 を付けない %-m などの書き方は
+     * Linux の strftime() にしか無い）、evolution-jp の evo()->mb_strftime() に任せる。
+     * %-m・%-d（先頭の 0 を付けない）や日本語の曜日 %曜 なども、mb_strftime() の書式で書ける
      */
     private function _f_dateformat($text, $param)
     {
@@ -2711,62 +2714,12 @@ class Class_cfFormMailer
             return $text;
         }
 
-        $datetime = (new DateTime())->setTimestamp($timestamp);
-
         // % を含まなければ date 形式
         if (strpos($param, '%') === false) {
-            return $datetime->format($param);
+            return (new DateTime())->setTimestamp($timestamp)->format($param);
         }
 
-        // PHP 8.1未満の場合はstrftimeを使用（8.1 から Deprecated）
-        if (PHP_VERSION_ID < 80100 && function_exists('strftime')) {
-            return strftime($param, $timestamp);
-        }
-
-        // strftimeフォーマットをDateTimeフォーマットに変換
-        $format_map = [
-            '%Y' => 'Y',  // 4桁の年
-            '%y' => 'y',  // 2桁の年
-            '%m' => 'm',  // 月（01-12）
-            '%d' => 'd',  // 日（01-31）
-            '%H' => 'H',  // 時（00-23）
-            '%M' => 'i',  // 分（00-59）
-            '%S' => 's',  // 秒（00-59）
-            '%B' => 'F',  // 月の完全名
-            '%b' => 'M',  // 月の短縮名
-            '%A' => 'l',  // 曜日の完全名
-            '%a' => 'D',  // 曜日の短縮名
-            '%e' => 'j',  // 日（1-31）
-            '%I' => 'h',  // 12時間制の時（01-12）
-            '%p' => 'A',  // AM/PM
-            '%w' => 'w',  // 曜日（0-6）
-        ];
-
-        // 指定子以外の英字は DateTime の書式文字と見なされないようエスケープする
-        $date_format = '';
-        $len = strlen($param);
-        for ($i = 0; $i < $len; $i++) {
-            $c = $param[$i];
-            if ($c === '%' && $i + 1 < $len) {
-                $directive = '%' . $param[$i + 1];
-                if (isset($format_map[$directive])) {
-                    $date_format .= $format_map[$directive];
-                    $i++;
-                    continue;
-                }
-                if ($directive === '%%') {
-                    $date_format .= '%';
-                    $i++;
-                    continue;
-                }
-            }
-            if (('a' <= $c && $c <= 'z') || ('A' <= $c && $c <= 'Z') || $c === '\\') {
-                $date_format .= '\\' . $c;
-                continue;
-            }
-            $date_format .= $c;
-        }
-        return $datetime->format($date_format);
+        return evo()->mb_strftime($param, $timestamp);
     }
 
     /**

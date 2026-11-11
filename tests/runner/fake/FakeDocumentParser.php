@@ -149,4 +149,68 @@ class FakeDocumentParser
             'msg' => $msg,
         ];
     }
+
+    /**
+     * evolution-jp（commit 1a4c24c98）の DocumentParser::mb_strftime() から写した。
+     * 曜日の名前は言語ファイル（$_lc）を読まず、本物の既定値（英語）を使う。それ以外は変えていない
+     */
+    public function mb_strftime($format = '%Y/%m/%d', $timestamp = '')
+    {
+        $a = explode(',', 'Sun, Mon, Tue, Wed, Thu, Fri, Sat');
+        $A = explode(',', 'Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday');
+
+        if ($timestamp === '') {
+            return '';
+        }
+
+        $date = new DateTime();
+        $date->setTimestamp($timestamp);
+
+        $w = $date->format('w');
+        $ampm = ($date->format('H') < 12) ? 'am' : 'pm';
+        $p = ['am' => 'AM', 'pm' => 'PM'];
+        $P = ['am' => 'am', 'pm' => 'pm'];
+
+        if (strpos(PHP_OS, 'WIN') === 0) {
+            $format = str_replace('%-', '%#', $format);
+        }
+
+        $replacements = [
+            '%a' => $a[$w],
+            '%A' => $A[$w],
+            '%p' => $p[$ampm],
+            '%P' => $P[$ampm],
+            '%Y' => $date->format('Y'),
+            '%y' => $date->format('y'),
+            '%m' => $date->format('m'),
+            '%B' => $date->format('F'),
+            '%b' => $date->format('M'),
+            '%d' => $date->format('d'),
+            '%e' => $date->format('j'),
+            '%H' => $date->format('H'),
+            '%I' => $date->format('h'),
+            '%M' => $date->format('i'),
+            '%S' => $date->format('s'),
+            '%w' => $date->format('w'),
+            '%j' => $date->format('z'),
+            '%U' => $date->format('W'),
+            '%W' => $date->format('W'),
+            '%C' => floor($date->format('Y') / 100),
+            '%u' => $date->format('N'),
+            '%V' => $date->format('W'),
+            '%z' => $date->format('O'),
+            '%Z' => $date->format('T'),
+            '%G' => $date->format('o'),
+            '%g' => $date->format('y'),
+            '%c' => $date->format('c'),
+            '%x' => $date->format('Y-m-d'),
+            '%X' => $date->format('H:i:s'),
+            '%%' => '%',
+            '%-m' => $date->format('n'),
+            '%-d' => $date->format('j'),
+            '%曜' => ['日', '月', '火', '水', '木', '金', '土'][$date->format('w')],
+        ];
+
+        return strtr($format, $replacements);
+    }
 }
