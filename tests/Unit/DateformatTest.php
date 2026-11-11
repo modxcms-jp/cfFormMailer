@@ -62,6 +62,51 @@ namespace CfFormMailer\Tests\Unit {
         }
 
         /** @test */
+        public function mb_strftimeが扱わない書式は先にstrftimeと同じ値にする(): void
+        {
+            $this->format('2026-01-01 09:03:05', '%j %U %W %g %R %T %D %F %h|%k|%l|%-H %-I %-M %-S %-y %-j');
+            $this->assertSame(
+                '001 00 00 26 09:03 09:03:05 01/01/26 2026-01-01 Jan| 9| 9|9 9 3 5 26 1',
+                $GLOBALS['modx']->calls[0][0]
+            );
+        }
+
+        /** @test */
+        public function mb_strftimeに任せる書式と百分率記号はそのまま渡す(): void
+        {
+            $this->format('2026-01-01 09:03:05', '%Y年%-m月%-d日（%曜） %%j %a');
+            $this->assertSame('%Y年%-m月%-d日（%曜） %%j %a', $GLOBALS['modx']->calls[0][0]);
+        }
+
+        /**
+         * evolution-jp の mb_strftime()（テスト用の写し）と合わせた結果が、strftime() と同じになる。
+         * strftime() は PHP 8.1 から非推奨なので、それより前の版でだけ確かめる
+         *
+         * @test
+         */
+        public function これまでのstrftimeと同じ結果になる(): void
+        {
+            if (PHP_VERSION_ID >= 80100 || !function_exists('strftime')) {
+                $this->markTestSkipped('strftime() と比べるのは PHP 8.1 未満だけ');
+            }
+            require_once dirname(__DIR__) . '/runner/fake/FakeDocumentParser.php';
+            $GLOBALS['modx'] = (new ReflectionClass(\FakeDocumentParser::class))->newInstanceWithoutConstructor();
+            setlocale(LC_TIME, 'C');
+
+            // 比べないもの:
+            // %e は mb_strftime() では空白で桁をそろえない（これまでの PHP 8.1 以降と同じ）。
+            // %s は glibc の strftime() が PHP のタイムゾーン設定を見ずにずれる。
+            // %a・%A は mb_strftime() では言語ファイルの曜日名になる
+            $format = '%Y %y %m %d %H %I %M %S %p %w %u %V %G %g %z '
+                . '%j %U %W %R %T %D %F %h %k %l %%j '
+                . '%-m %-d %-H %-I %-M %-S %-y %-j %b %B';
+            $dates = ['2026-01-01 09:03:05', '2026-01-04 00:00:00', '2026-12-31 23:59:59', '2024-02-29 12:30:00', '2027-01-03 13:07:09'];
+            foreach ($dates as $date) {
+                $this->assertSame(strftime($format, strtotime($date)), $this->format($date, $format), $date);
+            }
+        }
+
+        /** @test */
         public function date形式はそのままDateTimeで出す(): void
         {
             $this->assertSame('2026/08/04 9:03', $this->format('2026-08-04 09:03:00', 'Y/m/d G:i'));

@@ -2719,7 +2719,48 @@ class Class_cfFormMailer
             return (new DateTime())->setTimestamp($timestamp)->format($param);
         }
 
-        return evo()->mb_strftime($param, $timestamp);
+        return evo()->mb_strftime($this->_strftimeDirectives($param, $timestamp), $timestamp);
+    }
+
+    /**
+     * mb_strftime() が扱わない書式と、strftime() と結果の違う書式を、先に strftime() と同じ値に置き換える
+     *
+     * これまで PHP 8.1 未満では strftime() を使っていたので、その結果を変えないため。
+     * %j は mb_strftime() では 0 始まりで 3 桁にならず、%U・%W は ISO 週番号（%V と同じ）に、
+     * %g は ISO 週の年ではなく暦の年になる。
+     * %R・%T などは mb_strftime() に無く、文字のまま出る。
+     * %% は mb_strftime() に任せるため、そのまま残す（%%j を %j として出すため）
+     */
+    private function _strftimeDirectives($format, $timestamp)
+    {
+        $date = (new DateTime())->setTimestamp($timestamp);
+        $yday = (int)$date->format('z');
+        $wday = (int)$date->format('w');
+
+        return strtr($format, [
+            '%%' => '%%',
+            '%j' => sprintf('%03d', $yday + 1),
+            '%U' => sprintf('%02d', intdiv($yday + 7 - $wday, 7)),
+            '%W' => sprintf('%02d', intdiv($yday + 7 - ($wday + 6) % 7, 7)),
+            '%g' => sprintf('%02d', (int)$date->format('o') % 100),
+            '%R' => $date->format('H:i'),
+            '%T' => $date->format('H:i:s'),
+            '%D' => $date->format('m/d/y'),
+            '%F' => $date->format('Y-m-d'),
+            '%h' => $date->format('M'),
+            '%k' => sprintf('%2d', $date->format('G')),
+            '%l' => sprintf('%2d', $date->format('g')),
+            '%s' => (string)$timestamp,
+            '%n' => "\n",
+            '%t' => "\t",
+            // 先頭の 0 を付けない書き方（%-m・%-d は mb_strftime() にある）
+            '%-H' => $date->format('G'),
+            '%-I' => $date->format('g'),
+            '%-M' => (string)(int)$date->format('i'),
+            '%-S' => (string)(int)$date->format('s'),
+            '%-y' => (string)(int)$date->format('y'),
+            '%-j' => (string)($yday + 1),
+        ]);
     }
 
     /**

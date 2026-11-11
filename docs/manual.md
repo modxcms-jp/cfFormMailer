@@ -453,7 +453,7 @@ string で区切って表示 ※該当フィールドが配列の場合のみ有
 値を`<string></string>`タグで囲んで表示 ※該当フィールドが配列の場合のみ有効。
 
 **dateformat(format)**
-format に従い日付書式を変換。PHP関数 date() の書式（`Y-m-d` など）と、strftime() の書式（`%Y-%m-%d` など）のどちらでも書ける。strftime() の書式は MODX（evolution-jp）の `mb_strftime()` で変換するので、`%-m` `%-d`（先頭の 0 を付けない）や日本語の曜日 `%曜` も使える（例：`dateformat(%Y年%-m月%-d日)` → `2026年8月14日`）。strftime() そのものは使わないので、PHP の版や環境によらず同じ結果になる。
+format に従い日付書式を変換。PHP関数 date() の書式（`Y-m-d` など）と、strftime() の書式（`%Y-%m-%d` など）のどちらでも書ける。strftime() の書式は MODX（evolution-jp）の `mb_strftime()` で変換するので、`%-m` `%-d`（先頭の 0 を付けない）や日本語の曜日 `%曜` も使える（例：`dateformat(%Y年%-m月%-d日)` → `2026年8月14日`）。`%j` `%U` `%W` `%R` `%T` などは strftime() と同じ結果になる。strftime() そのものは使わないので、PHP の版や環境によらず同じ結果になる。
 
 **num**
 数字をフォーマット ※PHP関数 number_format() と同様。ただし第2引数以降は未対応。
