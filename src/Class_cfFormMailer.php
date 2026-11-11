@@ -2695,7 +2695,10 @@ class Class_cfFormMailer
     /**
      * dateformat(format) : 日付のフォーマット
      *
-     * strftime形式（%Y-%m-%d等）とdate形式（Y-m-d等）の両方に対応
+     * strftime形式（%Y-%m-%d等）とdate形式（Y-m-d等）の両方に対応。
+     * strftime形式は strftime() を使わず（PHP 8.1 から非推奨で、先頭の 0 を付けない %-m などの書き方は
+     * Linux の strftime() にしか無い）、evolution-jp の evo()->mb_strftime() に任せる。
+     * %-m・%-d（先頭の 0 を付けない）や日本語の曜日 %曜 なども、mb_strftime() の書式で書ける
      */
     private function _f_dateformat($text, $param)
     {
@@ -2711,62 +2714,53 @@ class Class_cfFormMailer
             return $text;
         }
 
-        $datetime = (new DateTime())->setTimestamp($timestamp);
-
         // % を含まなければ date 形式
         if (strpos($param, '%') === false) {
-            return $datetime->format($param);
+            return (new DateTime())->setTimestamp($timestamp)->format($param);
         }
 
-        // PHP 8.1未満の場合はstrftimeを使用（8.1 から Deprecated）
-        if (PHP_VERSION_ID < 80100 && function_exists('strftime')) {
-            return strftime($param, $timestamp);
-        }
+        return evo()->mb_strftime($this->_strftimeDirectives($param, $timestamp), $timestamp);
+    }
 
-        // strftimeフォーマットをDateTimeフォーマットに変換
-        $format_map = [
-            '%Y' => 'Y',  // 4桁の年
-            '%y' => 'y',  // 2桁の年
-            '%m' => 'm',  // 月（01-12）
-            '%d' => 'd',  // 日（01-31）
-            '%H' => 'H',  // 時（00-23）
-            '%M' => 'i',  // 分（00-59）
-            '%S' => 's',  // 秒（00-59）
-            '%B' => 'F',  // 月の完全名
-            '%b' => 'M',  // 月の短縮名
-            '%A' => 'l',  // 曜日の完全名
-            '%a' => 'D',  // 曜日の短縮名
-            '%e' => 'j',  // 日（1-31）
-            '%I' => 'h',  // 12時間制の時（01-12）
-            '%p' => 'A',  // AM/PM
-            '%w' => 'w',  // 曜日（0-6）
-        ];
+    /**
+     * mb_strftime() が扱わない書式と、strftime() と結果の違う書式を、先に strftime() と同じ値に置き換える
+     *
+     * これまで PHP 8.1 未満では strftime() を使っていたので、その結果を変えないため。
+     * %j は mb_strftime() では 0 始まりで 3 桁にならず、%U・%W は ISO 週番号（%V と同じ）に、
+     * %g は ISO 週の年ではなく暦の年になる。
+     * %R・%T などは mb_strftime() に無く、文字のまま出る。
+     * %% は mb_strftime() に任せるため、そのまま残す（%%j を %j として出すため）
+     */
+    private function _strftimeDirectives($format, $timestamp)
+    {
+        $date = (new DateTime())->setTimestamp($timestamp);
+        $yday = (int)$date->format('z');
+        $wday = (int)$date->format('w');
 
-        // 指定子以外の英字は DateTime の書式文字と見なされないようエスケープする
-        $date_format = '';
-        $len = strlen($param);
-        for ($i = 0; $i < $len; $i++) {
-            $c = $param[$i];
-            if ($c === '%' && $i + 1 < $len) {
-                $directive = '%' . $param[$i + 1];
-                if (isset($format_map[$directive])) {
-                    $date_format .= $format_map[$directive];
-                    $i++;
-                    continue;
-                }
-                if ($directive === '%%') {
-                    $date_format .= '%';
-                    $i++;
-                    continue;
-                }
-            }
-            if (('a' <= $c && $c <= 'z') || ('A' <= $c && $c <= 'Z') || $c === '\\') {
-                $date_format .= '\\' . $c;
-                continue;
-            }
-            $date_format .= $c;
-        }
-        return $datetime->format($date_format);
+        return strtr($format, [
+            '%%' => '%%',
+            '%j' => sprintf('%03d', $yday + 1),
+            '%U' => sprintf('%02d', intdiv($yday + 7 - $wday, 7)),
+            '%W' => sprintf('%02d', intdiv($yday + 7 - ($wday + 6) % 7, 7)),
+            '%g' => sprintf('%02d', (int)$date->format('o') % 100),
+            '%R' => $date->format('H:i'),
+            '%T' => $date->format('H:i:s'),
+            '%D' => $date->format('m/d/y'),
+            '%F' => $date->format('Y-m-d'),
+            '%h' => $date->format('M'),
+            '%k' => sprintf('%2d', $date->format('G')),
+            '%l' => sprintf('%2d', $date->format('g')),
+            '%s' => (string)$timestamp,
+            '%n' => "\n",
+            '%t' => "\t",
+            // 先頭の 0 を付けない書き方（%-m・%-d は mb_strftime() にある）
+            '%-H' => $date->format('G'),
+            '%-I' => $date->format('g'),
+            '%-M' => (string)(int)$date->format('i'),
+            '%-S' => (string)(int)$date->format('s'),
+            '%-y' => (string)(int)$date->format('y'),
+            '%-j' => (string)($yday + 1),
+        ]);
     }
 
     /**
