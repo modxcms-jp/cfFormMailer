@@ -593,8 +593,10 @@ class Class_cfFormMailer
                 $pat = '';
                 $rep = '';
                 $tag_opt = array();
+                // 属性の値（引用符の中）にある > や selected は、タグの終わりや属性として扱わない
+                $attrs = "(?:[^>\"']|\"[^\"]*\"|'[^']*')*";
                 preg_match_all(
-                    "/<option(.*?)value=(['\"])(.*?)\\2(.*?>)/uism",
+                    "/<option({$attrs}?)value=(['\"])(.*?)\\2({$attrs}>)/uis",
                     $tag[4],
                     $tag_opt,
                     PREG_SET_ORDER
@@ -604,9 +606,11 @@ class Class_cfFormMailer
                     $fieldValue = $params[$fieldName] ?? null;
                     foreach ($tag_opt as $v) {
                         // option の開始タグから属性の selected だけを外し、送られた値の option に付け直す
-                        $option = preg_replace(
-                            "/\s+selected(?:\s*=\s*(?:\"[^\"]*\"|'[^']*'|[^\s>]*))?(?=[\s\/>])/i",
-                            '',
+                        $option = preg_replace_callback(
+                            "/(\"[^\"]*\"|'[^']*')|\s+selected(?:\s*=\s*(?:\"[^\"]*\"|'[^']*'|[^\s>]*))?(?=[\s\/>])/i",
+                            static function ($m) {
+                                return $m[1] ?? '';
+                            },
                             $v[0]
                         );
                         if ($v[3] == $fieldValue) {

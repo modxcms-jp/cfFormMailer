@@ -9,6 +9,7 @@ use CfFormMailer\Tests\Harness\CharacterizationTestCase;
  *
  * - テンプレートで selected にしてある選択肢と同じ値が送られても、選択を外さない。
  * - 外すのは属性の selected だけで、value="unselected" のような値は変えない。
+ * - 属性の値（引用符の中）にある > や selected は、タグの終わりや属性として扱わない。
  */
 class SelectRestoreTest extends CharacterizationTestCase
 {
@@ -19,7 +20,7 @@ class SelectRestoreTest extends CharacterizationTestCase
     {
         $this->assertSnapshot('same_as_template', $this->runStep([
             'snippet_params' => ['config' => self::CONFIG],
-            'post' => ['_mode' => 'conf', 'name' => '', 'pref' => 'tokyo', 'state' => 'selected'],
+            'post' => ['_mode' => 'conf', 'name' => '', 'pref' => 'tokyo', 'state' => 'selected', 'order' => 'c'],
         ]));
     }
 
@@ -28,7 +29,7 @@ class SelectRestoreTest extends CharacterizationTestCase
     {
         $this->assertSnapshot('other_than_template', $this->runStep([
             'snippet_params' => ['config' => self::CONFIG],
-            'post' => ['_mode' => 'conf', 'name' => '', 'pref' => 'osaka', 'state' => 'unselected'],
+            'post' => ['_mode' => 'conf', 'name' => '', 'pref' => 'osaka', 'state' => 'unselected', 'order' => 'b'],
         ]));
     }
 }
