@@ -1510,7 +1510,7 @@ class Class_cfFormMailer
     }
 
     /**
-     * NULL 値を文字列に変換
+     * 空の値（null・false・空文字）を文字列に変換する。0 は値として残す
      *
      * @param mixed $data 変換するデータ
      * @param string $string 変換される文字列(Default: &nbsp;)
@@ -1524,7 +1524,7 @@ class Class_cfFormMailer
             }
             return $data;
         }
-        if (!$data) {
+        if ($data === null || $data === false || $data === '') {
             return $string;
         }
         return $data;
