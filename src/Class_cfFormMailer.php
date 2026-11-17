@@ -603,26 +603,16 @@ class Class_cfFormMailer
                     $old = $tag[0];
                     $fieldValue = $params[$fieldName] ?? null;
                     foreach ($tag_opt as $v) {
-                        $tag[0] = str_replace(
-                            $v[0],
-                            preg_replace(
-                                "/selected(=(['\"])selected\\2)?/uism",
-                                '',
-                                $v[0]
-                            ),
-                            $tag[0]
+                        // option の開始タグから属性の selected だけを外し、送られた値の option に付け直す
+                        $option = preg_replace(
+                            "/\s+selected(?:\s*=\s*(?:\"[^\"]*\"|'[^']*'|[^\s>]*))?(?=[\s\/>])/i",
+                            '',
+                            $v[0]
                         );
                         if ($v[3] == $fieldValue) {
-                            $tag[0] = str_replace(
-                                $v[0],
-                                str_replace(
-                                    $v[4],
-                                    ' selected="selected"' . $v[4],
-                                    $v[0]
-                                ),
-                                $tag[0]
-                            );
+                            $option = preg_replace('/\s*\/?>$/', ' selected="selected"$0', $option);
                         }
+                        $tag[0] = str_replace($v[0], $option, $tag[0]);
                     }
                     $html = str_replace($old, $tag[0], $html);
                 }
