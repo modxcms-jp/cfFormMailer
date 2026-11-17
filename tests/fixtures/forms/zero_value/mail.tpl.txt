@@ -1,0 +1,4 @@
+人数: [+count+]
+金額: [+amount+]
+品目: [+items+]
+備考: [+note+]
