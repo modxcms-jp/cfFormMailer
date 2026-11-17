@@ -1,0 +1,29 @@
+== return ==
+<p>人数: 0</p>
+<p>金額: 0</p>
+<p>品目: 0<br />1</p>
+<p>備考: &nbsp;</p>
+<form action="[~[*id*]~]" method="post"><input type="hidden" name="_mode" value="send" />
+  <input type="submit" value="送信する" />
+<input type="hidden" name="count" value="0" />
+<input type="hidden" name="amount" value="0" />
+<input type="hidden" name="items[]" value="0" />
+<input type="hidden" name="items[]" value="1" />
+<input type="hidden" name="note" value="" /><input type="hidden" name="_cffm_token" value="<TOKEN>" /></form>
+
+== session ==
+array (
+  '_cffm_confirmed' => 
+  array (
+    'amount' => '0',
+    'count' => '0',
+    'items' => 
+    array (
+      0 => '0',
+      1 => '1',
+    ),
+    'note' => '',
+  ),
+  '_cffm_token' => '<TOKEN>',
+  'dynamic_send_to' => NULL,
+)
